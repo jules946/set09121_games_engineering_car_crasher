@@ -42,11 +42,23 @@ else()
     )
 endif()
 
+
+# Maths lib
+add_library(lib_maths INTERFACE)
+target_sources(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths/maths.h")
+target_include_directories(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths" SYSTEM INTERFACE ${SFML_INCS})
+
+## ECM Library
+file(GLOB_RECURSE SOURCE_FILES lib_ecm/*.cpp lib_ecm/*.h)
+add_library(lib_ecm STATIC ${SOURCE_FILES})
+target_include_directories(lib_ecm INTERFACE "${CMAKE_SOURCE_DIR}/lib_ecm" SYSTEM INTERFACE ${SFML_INCS} "${CMAKE_SOURCE_DIR}/lib_maths")
+target_link_libraries(lib_ecm PRIVATE lib_maths)
+
 ## Car Crasher
 file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
 add_executable(CAR_CRASHER ${SOURCES})
 target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS})
-target_link_libraries(CAR_CRASHER sfml-graphics)
+target_link_libraries(CAR_CRASHER sfml-graphics lib_ecm)
 
 # Set the working directory for the Visual Studio debugger when running CAR_CRASHER
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
