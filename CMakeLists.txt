@@ -67,3 +67,6 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)
     )
 endif()
+
+# Make sure that the 'copy_resources' target is executed before building Tile Engine
+add_dependencies(CAR_CRASHER copy_resources)

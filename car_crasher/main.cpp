@@ -1,22 +1,52 @@
-// main.cpp
-
+//main.cpp
 #include <SFML/Graphics.hpp>
+#include <memory>
+#include "car_crasher.h"
+#include "system_renderer.h"
 
-int main(){
-    sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+using namespace sf;
+using namespace std;
 
-    while (window.isOpen()){
-        sf::Event event;
-        while (window.pollEvent(event)){
-            if (event.type == sf::Event::Closed){
-                window.close();
-            }
-        }
+void Load() {
+    // Create menu and game scenes
+    menuScene = std::make_shared<MenuScene>();
+    gameScene = std::make_shared<GameScene>();
+
+    // load scenes
+    menuScene->load();
+    gameScene->load();
+
+    // start at main menu
+    activeScene = menuScene;
+}
+
+void Update() {
+    static Clock clock;
+    const double dt = clock.restart().asSeconds();
+
+    // Update all entities via EntityManager in active scene
+    activeScene->update(dt);
+}
+
+void Render() {
+    activeScene->render();
+    // render using renderer system
+    Renderer::render();
+}
+
+
+int main() {
+    RenderWindow window(VideoMode(gameWidth, gameHeight), "Car Crasher");
+    Renderer::initialise(window);
+    Load();
+
+    while (window.isOpen()) {
         window.clear();
-        window.draw(shape);
+        Update();
+        Render();
         window.display();
     }
+
+    Renderer::shutdown();
     return 0;
 }
