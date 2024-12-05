@@ -12,7 +12,6 @@ extern std::shared_ptr<Scene> gameScene;
 constexpr float gameWidth = 800.0f;
 constexpr float gameHeight = 600.0f;
 
-// extern sf::Texture spritesheet;
 
 // Forward declaration of MenuScene class
 class MenuScene final : public Scene {

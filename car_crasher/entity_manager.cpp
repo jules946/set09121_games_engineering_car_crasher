@@ -1,5 +1,5 @@
 //entity.cpp
-#include "entity.h"
+#include "entity_manager.h"
 
 #include "cmp_sprite.h"
 #include "system_renderer.h"

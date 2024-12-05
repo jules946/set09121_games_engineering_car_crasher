@@ -4,20 +4,18 @@
 #include "ecm.h"
 #include <SFML/Graphics.hpp>
 
-class ShapeComponent : public Component {
+class SpriteComponent final : public Component {
 protected:
-    std::shared_ptr<sf::Shape> _shape;
+    std::shared_ptr<sf::Sprite> _sprite;
+    std::shared_ptr<sf::Texture> _texture;
 public:
-    ShapeComponent() = delete;
-    explicit ShapeComponent(Entity *p);
+    SpriteComponent() = delete;
+    explicit SpriteComponent(Entity *p);
 
     void update(double dt) override;
     void render() override;
 
-    sf::Shape &getShape() const;
+    sf::Sprite &getSprite() const;
 
-    template <typename T, typename... Targs>
-    void setShape(Targs... params) {
-        _shape.reset(new T(params...));
-    }
+    void setTexture(const std::string &textureFile);
 };
