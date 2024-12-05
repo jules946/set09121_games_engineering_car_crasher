@@ -57,7 +57,7 @@ void GameScene::load() {
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
-    s->getSprite().setOrigin(Vector2f(12.f, 12.f));
+    s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f, s->getSprite().getLocalBounds().height / 2.f);
     player->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
     player->addComponent<PlayerMovementComponent>();
     _entity_manager.list.push_back(player);
