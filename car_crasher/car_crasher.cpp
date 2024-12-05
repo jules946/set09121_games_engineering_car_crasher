@@ -1,9 +1,9 @@
 //car_crasher.cpp
-#include "car_crasher.h"
-
 #include <cmath>
 
-#include "cmp_actor_movement.h"
+#include "car_crasher.h"
+#include "cmp_player_movement.h"
+#include "cmp_sound_effect.h"
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
@@ -15,7 +15,6 @@ std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
 
-#define GHOSTS_COUNT 4
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -25,7 +24,7 @@ void MenuScene::load() {
     text.setFont(font); // Set the font of the text
     text.setCharacterSize(24); // Set the character size
     text.setFillColor(sf::Color::White); // Set the text color
-    text.setString("Almost Pacman");
+    text.setString("Car Crasher");
     // Get text bounds
     const FloatRect bounds = text.getLocalBounds();
 
@@ -42,7 +41,7 @@ void MenuScene::update(const double dt) {
         activeScene = gameScene;
     }
     Scene::update(dt);
-    text.setString("Almost Pacman");
+    text.setString("Car Crasher");
 }
 
 void MenuScene::render() {
@@ -52,31 +51,25 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
-    const auto pl = make_shared<Entity>();
+    static constexpr float lanePositions[3] = {100.0f, 200.0f, 300.0f};
 
-    const auto s = pl->addComponent<ShapeComponent>();
-        s->setShape<sf::CircleShape>(12.f);
-        s->getShape().setFillColor(Color::Yellow);
-        s->getShape().setOrigin(Vector2f(12.f, 12.f));
-        pl->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
-        pl->addComponent<PlayerMovementComponent>();
-        _ents.list.push_back(pl);
+    const auto player = make_shared<Entity>();
 
-    const Color ghost_cols[]{{208, 62, 25},         // red Blinky
-                                 {219, 133, 28},    // orange Clyde
-                                 {70, 191, 238},    // cyan Inky
-                                 {234, 130, 229}};  // pink Pinky
+    // Add Sprite Component
+    const auto s = player->addComponent<SpriteComponent>();
+    s->setTexture("res/img/BlueCar.png");
+    s->getSprite().setScale(2.0f, 2.0f);
+    s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f, s->getSprite().getLocalBounds().height / 2.f);
 
-    for (int i = 0; i < GHOSTS_COUNT; ++i) {
-        auto ghost = make_shared<Entity>();
-        auto s = ghost->addComponent<ShapeComponent>();
-        s->setShape<sf::CircleShape>(12.f);
-        s->getShape().setFillColor(ghost_cols[i % 4]);
-        s->getShape().setOrigin(Vector2f(12.f, 12.f));
-        ghost->addComponent<EnemyAIComponent>();
+    // Add Player Movement Component
+    player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
+    player->addComponent<PlayerMovementComponent>(lanePositions);
 
-        _ents.list.push_back(ghost);
-    }
+    // Set initial position to middle lane and middle of screen height
+    player->setPosition(sf::Vector2f(lanePositions[1], gameHeight / 2.f));
+
+    // Add to entity manager
+    _entity_manager.list.push_back(player);
 }
 
 void GameScene::update(const double dt) {

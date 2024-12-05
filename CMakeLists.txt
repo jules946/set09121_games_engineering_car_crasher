@@ -43,6 +43,7 @@ else()
 endif()
 
 
+
 # Maths lib
 add_library(lib_maths INTERFACE)
 target_sources(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths/maths.h")
@@ -58,7 +59,17 @@ target_link_libraries(lib_ecm PRIVATE lib_maths)
 file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
 add_executable(CAR_CRASHER ${SOURCES})
 target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS})
-target_link_libraries(CAR_CRASHER sfml-graphics lib_ecm)
+target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)
+
+# Copy the OpenAL32.dll file to the output directory to get audio working
+if (WIN32)
+    add_custom_command(TARGET CAR_CRASHER POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/OpenAL32.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
+    )
+endif()
+
 
 # Set the working directory for the Visual Studio debugger when running CAR_CRASHER
 if (CMAKE_GENERATOR MATCHES "Visual Studio")

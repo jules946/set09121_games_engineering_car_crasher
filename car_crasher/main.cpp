@@ -39,15 +39,32 @@ void Render() {
 int main() {
     RenderWindow window(VideoMode(gameWidth, gameHeight), "Car Crasher");
     Renderer::initialise(window);
-    Load();
 
-    while (window.isOpen()) {
-        window.clear();
-        Update();
-        Render();
-        window.display();
+    try {
+        Load(); // Load resources and initialize scenes
+
+        while (window.isOpen()) {
+            Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == Event::Closed) {
+                    window.close(); // Handle window close event
+                }
+                if (event.type == Event::Resized) {
+                    // Adjust view to fit resized window
+                    FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                    window.setView(View(visibleArea));
+                }
+            }
+
+            window.clear(); // Clear the window
+            Update();       // Update game logic
+            Render();       // Render current scene
+            window.display();
+        }
+    } catch (const exception &e) {
+        cerr << "Error: " << e.what() << endl;
     }
 
-    Renderer::shutdown();
+    Renderer::shutdown(); // Clean up renderer
     return 0;
 }
