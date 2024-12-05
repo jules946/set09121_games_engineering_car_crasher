@@ -51,17 +51,17 @@ public:
         return std::move(ret);
     }
     template <typename T>
-    const std::vector<std::shared_ptr<T>> GetCompatibleComponent() {
-        static_assert(std::is_base_of<Component, T>::value, "T != component");
-        std::vector<std::shared_ptr<T>> ret;
-        for (auto c : _components) {
-            auto dd = dynamic_cast<T*>(&(*c));
-            if (dd) {
-                ret.push_back(std::dynamic_pointer_cast<T>(c));
+    std::shared_ptr<T> getComponent() const {
+        static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
+        for (const auto& component : _components) {
+            auto casted = std::dynamic_pointer_cast<T>(component);
+            if (casted) {
+                return casted; // Return the first component of type T
             }
         }
-        return ret;
+        return nullptr; // No matching component found
     }
+
 };
 
 class Component {

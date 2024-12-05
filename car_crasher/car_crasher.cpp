@@ -1,9 +1,8 @@
 //car_crasher.cpp
-#include "car_crasher.h"
-
 #include <cmath>
 
-#include "cmp_actor_movement.h"
+#include "car_crasher.h"
+#include "cmp_player_movement.h"
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
@@ -15,7 +14,6 @@ std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
 
-#define GHOSTS_COUNT 4
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -42,7 +40,7 @@ void MenuScene::update(const double dt) {
         activeScene = gameScene;
     }
     Scene::update(dt);
-    text.setString("Almost Pacman");
+    text.setString("Car Crasher");
 }
 
 void MenuScene::render() {
@@ -52,14 +50,23 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
+    static constexpr float lanePositions[3] = {100.0f, 200.0f, 300.0f};
+
     const auto player = make_shared<Entity>();
 
+    // Add Sprite Component
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f, s->getSprite().getLocalBounds().height / 2.f);
-    player->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
-    player->addComponent<PlayerMovementComponent>();
+
+    // Add Player Movement Component
+    player->addComponent<PlayerMovementComponent>(lanePositions);
+
+    // Set initial position to middle lane and middle of screen height
+    player->setPosition(sf::Vector2f(lanePositions[1], gameHeight / 2.f));
+
+    // Add to entity manager
     _entity_manager.list.push_back(player);
 }
 

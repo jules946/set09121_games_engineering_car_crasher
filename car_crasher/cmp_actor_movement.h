@@ -20,20 +20,3 @@ public:
     void update(double dt) override;
 };
 
-class PlayerMovementComponent final : public ActorMovementComponent {
-public:
-    explicit PlayerMovementComponent(Entity* p);
-    void update(double dt) override;
-};
-
-
-class EnemyAIComponent final : public ActorMovementComponent {
-private:
-    sf::Vector2f _direction;
-    sf::Clock _directionChangeTimer;
-public:
-    explicit EnemyAIComponent(Entity* p);
-    void update(double dt) override;
-    void changeDirection();
-
-};
