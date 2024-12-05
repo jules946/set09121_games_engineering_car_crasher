@@ -3,6 +3,7 @@
 
 #include "car_crasher.h"
 #include "cmp_player_movement.h"
+#include "cmp_sound_effect.h"
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
@@ -61,6 +62,7 @@ void GameScene::load() {
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f, s->getSprite().getLocalBounds().height / 2.f);
 
     // Add Player Movement Component
+    player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
     player->addComponent<PlayerMovementComponent>(lanePositions);
 
     // Set initial position to middle lane and middle of screen height
