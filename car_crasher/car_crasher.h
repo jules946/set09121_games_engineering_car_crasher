@@ -29,12 +29,12 @@ public:
 // Forward declaration of GameScene class
 class GameScene final : public Scene {
 private:
-    sf::Text text;
-    sf::Clock scoreClock;
-    void respawn();
+    static constexpr float _lanePositions[3] = {100.0f, 200.0f, 300.0f};
+    sf::Clock spawnClock;
+    float spawnInterval;
 
 public:
-    GameScene() = default;
+    GameScene() : spawnInterval(2.0f) {}
     void update(double dt) override;
     void render() override;
     void load() override;

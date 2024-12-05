@@ -7,6 +7,7 @@
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
+#include "obstacles.h"
 
 using namespace sf;
 using namespace std;
@@ -15,6 +16,7 @@ std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
 
+constexpr float GameScene::_lanePositions[3];  // Definition of the static member
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -55,6 +57,9 @@ void GameScene::load() {
 
     const auto player = make_shared<Entity>();
 
+    // Reset spawn clock
+    spawnClock.restart();
+
     // Add Sprite Component
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
@@ -72,10 +77,19 @@ void GameScene::load() {
     _entity_manager.list.push_back(player);
 }
 
+
 void GameScene::update(const double dt) {
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
+
+    // Spawn new obstacle every spawnInterval seconds
+    if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
+        auto obstacle = Obstacle::makeObstacle(_lanePositions);
+        _entity_manager.list.push_back(obstacle);
+        spawnClock.restart();
+    }
+
     Scene::update(dt);
 }
 
