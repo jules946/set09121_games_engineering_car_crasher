@@ -7,7 +7,7 @@
 void Scene::load() {}
 
 // Update all entities in the scene
-void Scene::update(const double dt) { _ents.update(dt); }
+void Scene::update(const double dt) { _entity_manager.update(dt); }
 
 // Render all entities in the scene
-void Scene::render() { _ents.render(); }
+void Scene::render() { _entity_manager.render(); }

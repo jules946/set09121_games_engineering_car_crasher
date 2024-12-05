@@ -1,7 +1,7 @@
 //scene.h
 #pragma once
 
-#include "entity.h"
+#include "entity_manager.h"
 
 class Scene {
 public:
@@ -14,5 +14,5 @@ public:
     std::vector<std::shared_ptr<Entity>> &getEnts();
 
 protected:
-    EntityManager _ents;
+    EntityManager _entity_manager;
 };

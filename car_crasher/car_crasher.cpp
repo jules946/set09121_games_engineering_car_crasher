@@ -25,7 +25,7 @@ void MenuScene::load() {
     text.setFont(font); // Set the font of the text
     text.setCharacterSize(24); // Set the character size
     text.setFillColor(sf::Color::White); // Set the text color
-    text.setString("Almost Pacman");
+    text.setString("Car Crasher");
     // Get text bounds
     const FloatRect bounds = text.getLocalBounds();
 
@@ -52,31 +52,15 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
-    const auto pl = make_shared<Entity>();
+    const auto player = make_shared<Entity>();
 
-    const auto s = pl->addComponent<ShapeComponent>();
-        s->setShape<sf::CircleShape>(12.f);
-        s->getShape().setFillColor(Color::Yellow);
-        s->getShape().setOrigin(Vector2f(12.f, 12.f));
-        pl->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
-        pl->addComponent<PlayerMovementComponent>();
-        _ents.list.push_back(pl);
-
-    const Color ghost_cols[]{{208, 62, 25},         // red Blinky
-                                 {219, 133, 28},    // orange Clyde
-                                 {70, 191, 238},    // cyan Inky
-                                 {234, 130, 229}};  // pink Pinky
-
-    for (int i = 0; i < GHOSTS_COUNT; ++i) {
-        auto ghost = make_shared<Entity>();
-        auto s = ghost->addComponent<ShapeComponent>();
-        s->setShape<sf::CircleShape>(12.f);
-        s->getShape().setFillColor(ghost_cols[i % 4]);
-        s->getShape().setOrigin(Vector2f(12.f, 12.f));
-        ghost->addComponent<EnemyAIComponent>();
-
-        _ents.list.push_back(ghost);
-    }
+    const auto s = player->addComponent<SpriteComponent>();
+    s->setTexture("res/img/BlueCar.png");
+    s->getSprite().setScale(2.0f, 2.0f);
+    s->getSprite().setOrigin(Vector2f(12.f, 12.f));
+    player->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
+    player->addComponent<PlayerMovementComponent>();
+    _entity_manager.list.push_back(player);
 }
 
 void GameScene::update(const double dt) {
