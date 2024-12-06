@@ -8,6 +8,7 @@
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 #include "obstacles.h"
+#include "background.h"
 
 using namespace sf;
 using namespace std;
@@ -73,6 +74,10 @@ void GameScene::load() {
     // Set initial position to middle lane and middle of screen height
     player->setPosition(sf::Vector2f(lanePositions[1], gameHeight / 2.f));
 
+    // Adding background
+    auto background = Background::makeBackground();
+    _entity_manager.list.push_back(background);
+
     // Add to entity manager
     _entity_manager.list.push_back(player);
 }
@@ -89,6 +94,7 @@ void GameScene::update(const double dt) {
         _entity_manager.list.push_back(obstacle);
         spawnClock.restart();
     }
+
 
     Scene::update(dt);
 }
