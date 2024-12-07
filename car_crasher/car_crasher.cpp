@@ -10,6 +10,8 @@
 #include "system_renderer.h"
 #include "obstacles.h"
 #include "background_manager.h"
+#include "obstacle_manager.h"
+#include "obstacle_manager.h"
 
 using namespace sf;
 using namespace std;
@@ -17,8 +19,6 @@ using namespace std;
 std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
-
-constexpr float GameScene::_lanePositions[3];
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -58,6 +58,17 @@ void GameScene::load() {
     // add background
     _backgroundManager.loadBackground(_entity_manager);
 
+    // Initialize obstacle manager
+    _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
+
+    // Add obstacle sprites
+    _obstacleManager->addObstacleSprite("res/img/Construction_sign.png");
+    _obstacleManager->addObstacleSprite("res/img/Street_baracade.png");
+    _obstacleManager->addObstacleSprite("res/img/Street_baracade_2.png");
+    _obstacleManager->addObstacleSprite("res/img/Traffic_cone.png");
+
+
+
     // Create player
     const auto player = make_shared<Entity>();
 
@@ -79,15 +90,14 @@ void GameScene::load() {
 }
 
 void GameScene::update(const double dt) {
+
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
 
-    // Spawn new obstacle every spawnInterval seconds
-    if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
-        const auto obstacle = Obstacle::makeObstacle(_lanePositions);
-        _entity_manager.list.push_back(obstacle);
-        spawnClock.restart();
+    // Update obstacle manager
+    if (_obstacleManager) {
+        _obstacleManager->update(dt);
     }
 
     Scene::update(dt);

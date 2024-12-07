@@ -58,9 +58,11 @@ target_link_libraries(lib_ecm PRIVATE lib_maths)
 ## Car Crasher
 file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
 # Explicitly add obstacle files
+# Explicitly add files
 list(APPEND SOURCES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacles.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacles.h")
+    "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacle_manager.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/background_manager.cpp"
+)
 add_executable(CAR_CRASHER ${SOURCES})
 target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS} "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher")
 target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)

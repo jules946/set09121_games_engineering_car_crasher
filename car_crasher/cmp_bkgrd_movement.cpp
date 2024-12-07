@@ -1,5 +1,7 @@
+//cmp_bkgrd_movement.cpp
 #include "cmp_bkgrd_movement.h"
 #include "car_crasher.h"
+
 
 // Constructor
 BackgroundMovementComponent::BackgroundMovementComponent(Entity* p, float scrollSpeed, float screenHeight, float tileHeight)
@@ -30,3 +32,4 @@ void BackgroundMovementComponent::update(double dt) {
 void BackgroundMovementComponent::render() {
     // No rendering logic needed
 }
+
