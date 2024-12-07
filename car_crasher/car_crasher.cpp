@@ -8,6 +8,7 @@
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 #include "obstacles.h"
+#include "obstacle_manager.h"
 
 using namespace sf;
 using namespace std;
@@ -75,6 +76,9 @@ void GameScene::load() {
 
     // Add to entity manager
     _entity_manager.list.push_back(player);
+
+    // Initialise Obstacle Manager
+    obstacleManager obstacle_manager = obstacleManager(lanePositions);
 }
 
 
@@ -85,8 +89,10 @@ void GameScene::update(const double dt) {
 
     // Spawn new obstacle every spawnInterval seconds
     if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
-        auto obstacle = Obstacle::makeObstacle(_lanePositions);
-        _entity_manager.list.push_back(obstacle);
+        Entity obstacle_entity = obstacle_manager.createObstacle();
+
+        // auto obstacle = Obstacle::makeObstacle(_lanePositions);
+        _entity_manager.list.push_back(obstacle_entity);
         spawnClock.restart();
     }
 
