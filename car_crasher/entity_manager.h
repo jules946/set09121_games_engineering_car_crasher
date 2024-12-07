@@ -1,4 +1,4 @@
-// entity.h
+// entity_manager.h
 #pragma once
 
 #include <memory>

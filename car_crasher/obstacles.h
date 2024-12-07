@@ -33,7 +33,7 @@ private:
     static const std::vector<std::string> OBSTACLE_SPRITES;
 
 public:
-    static constexpr float OBSTACLE_SPEED = 200.0f;  // Moved to public
+    static constexpr float OBSTACLE_SPEED = 100.0f;  // Moved to public
     void update(double dt) override;
     static std::shared_ptr<Obstacle> makeObstacle(const float* lanePositions);
     ~Obstacle() override = default;

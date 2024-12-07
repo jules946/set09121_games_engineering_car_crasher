@@ -3,12 +3,13 @@
 
 #include "car_crasher.h"
 #include "cmp_player_movement.h"
+#include "game_config.h"
 #include "cmp_sound_effect.h"
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 #include "obstacles.h"
-#include "obstacle_manager.h"
+#include "background_manager.h"
 
 using namespace sf;
 using namespace std;
@@ -17,7 +18,7 @@ std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
 
-constexpr float GameScene::_lanePositions[3];  // Definition of the static member
+constexpr float GameScene::_lanePositions[3];
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -44,7 +45,7 @@ void MenuScene::update(const double dt) {
         activeScene = gameScene;
     }
     Scene::update(dt);
-    text.setString("Car Crasher");
+    // text.setString("Car Crasher");
 }
 
 void MenuScene::render() {
@@ -54,33 +55,28 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
-    static constexpr float lanePositions[3] = {100.0f, 200.0f, 300.0f};
+    // add background
+    _backgroundManager.loadBackground(_entity_manager);
 
+    // Create player
     const auto player = make_shared<Entity>();
 
-    // Reset spawn clock
-    spawnClock.restart();
-
-    // Add Sprite Component
+    // Add sprite component
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
-    s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f, s->getSprite().getLocalBounds().height / 2.f);
+    s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
+                             s->getSprite().getLocalBounds().height / 2.f);
 
-    // Add Player Movement Component
+    // Set initial position to middle lane
+    player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
+
+    // Add sound and movement components
     player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
     player->addComponent<PlayerMovementComponent>(lanePositions);
 
-    // Set initial position to middle lane and middle of screen height
-    player->setPosition(sf::Vector2f(lanePositions[1], gameHeight / 2.f));
-
-    // Add to entity manager
     _entity_manager.list.push_back(player);
-
-    // Initialise Obstacle Manager
-    obstacleManager obstacle_manager = obstacleManager(lanePositions);
 }
-
 
 void GameScene::update(const double dt) {
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
@@ -89,10 +85,8 @@ void GameScene::update(const double dt) {
 
     // Spawn new obstacle every spawnInterval seconds
     if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
-        Entity obstacle_entity = obstacle_manager.createObstacle();
-
-        // auto obstacle = Obstacle::makeObstacle(_lanePositions);
-        _entity_manager.list.push_back(obstacle_entity);
+        const auto obstacle = Obstacle::makeObstacle(_lanePositions);
+        _entity_manager.list.push_back(obstacle);
         spawnClock.restart();
     }
 

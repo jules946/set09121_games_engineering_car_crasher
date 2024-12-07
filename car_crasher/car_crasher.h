@@ -1,17 +1,14 @@
 //car_crasher.h
 #pragma once
-
-#include <memory>
 #include "scene.h"
+#include "background_manager.h"
+
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 extern std::shared_ptr<Scene> activeScene;
 extern std::shared_ptr<Scene> menuScene;
 extern std::shared_ptr<Scene> gameScene;
-
-constexpr float gameWidth = 800.0f;
-constexpr float gameHeight = 600.0f;
-
 
 // Forward declaration of MenuScene class
 class MenuScene final : public Scene {
@@ -29,6 +26,7 @@ public:
 // Forward declaration of GameScene class
 class GameScene final : public Scene {
 private:
+    backgroundManager _backgroundManager;
     static constexpr float _lanePositions[3] = {100.0f, 200.0f, 300.0f};
     sf::Clock spawnClock;
     float spawnInterval;
