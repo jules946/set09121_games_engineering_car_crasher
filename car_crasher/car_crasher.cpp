@@ -9,7 +9,6 @@
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 #include "obstacles.h"
-#include "background.h"
 #include "background_manager.h"
 
 using namespace sf;
