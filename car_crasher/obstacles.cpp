@@ -1,6 +1,6 @@
 //obstacles.cpp
 #include "obstacles.h"
-#include "system_renderer.h"
+#include "game_config.h"
 #include "car_crasher.h"  // Add this to get access to gameHeight
 
 // Define sprite paths for each obstacle type

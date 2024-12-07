@@ -14,6 +14,10 @@ Entity::Entity()
 Entity::~Entity() = default;
 
 void Entity::update(double dt) {
+    if (!_alive) {
+        return;
+    }
+
     for (auto &comp : _components) {
         if (!comp->is_fordeletion()) {
             comp->update(dt);

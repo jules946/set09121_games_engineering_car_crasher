@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include "car_crasher.h"
+#include "game_config.h"
 #include "system_renderer.h"
 
 using namespace sf;

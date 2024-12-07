@@ -1,7 +1,7 @@
 // "cmp_actor_movement.cpp"
 #include "cmp_actor_movement.h"
-
 #include "car_crasher.h"
+
 using namespace sf;
 
 void ActorMovementComponent::update(double dt) {}
