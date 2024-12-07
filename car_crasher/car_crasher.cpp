@@ -61,7 +61,7 @@ void GameScene::load() {
     // Create player
     const auto player = make_shared<Entity>();
 
-    // Add sprite component first
+    // Add sprite component
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
@@ -71,7 +71,7 @@ void GameScene::load() {
     // Set initial position to middle lane
     player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
 
-    // Add components
+    // Add sound and movement components
     player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
     player->addComponent<PlayerMovementComponent>(lanePositions);
 
@@ -85,7 +85,7 @@ void GameScene::update(const double dt) {
 
     // Spawn new obstacle every spawnInterval seconds
     if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
-        auto obstacle = Obstacle::makeObstacle(_lanePositions);
+        const auto obstacle = Obstacle::makeObstacle(_lanePositions);
         _entity_manager.list.push_back(obstacle);
         spawnClock.restart();
     }

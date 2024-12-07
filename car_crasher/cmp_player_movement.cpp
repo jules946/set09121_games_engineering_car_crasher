@@ -7,7 +7,7 @@
 
 #include "cmp_sound_effect.h"
 
-PlayerMovementComponent::PlayerMovementComponent(Entity* p, const std::array<float, 3>& lanePositions,
+PlayerMovementComponent::PlayerMovementComponent(Entity* p, const std::array<float, 4>& lanePositions,
                                                float moveSpeed, float tiltAngle)
     : ActorMovementComponent(p), _lanePositions(lanePositions),
       _moveSpeed(moveSpeed), _tiltAngle(tiltAngle) {
@@ -24,7 +24,6 @@ void PlayerMovementComponent::update(const double dt) {
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && _currentLane > 0 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
-        std::cout << "Moving left from lane " << _currentLane << " to " << (_currentLane-1) << "\n";
         _currentLane--;
         _targetX = _lanePositions[_currentLane];
         if (_soundEffect) {
@@ -32,9 +31,8 @@ void PlayerMovementComponent::update(const double dt) {
         }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && _currentLane < 2 &&
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && _currentLane < numLanes - 1 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
-        std::cout << "Moving right from lane " << _currentLane << " to " << (_currentLane+1) << "\n";
         _currentLane++;
         _targetX = _lanePositions[_currentLane];
         if (_soundEffect) {
@@ -44,7 +42,6 @@ void PlayerMovementComponent::update(const double dt) {
 
     if (std::abs(_targetX - _parent->getPosition().x) > 1.0f) {
         const auto moveDistance = static_cast<float>((_targetX - _parent->getPosition().x) * _moveSpeed * dt);
-        std::cout << "Moving distance: " << moveDistance << "\n";
 
         move(moveDistance, 0.0f);
 
