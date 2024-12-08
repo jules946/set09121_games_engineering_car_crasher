@@ -26,4 +26,6 @@ void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const
 void CollisionManager::handlePlayerCollision(const std::shared_ptr<Entity>& player, const std::shared_ptr<Entity>& obstacle) {
     // TODO: Implement collision handling
     std::cout << "Collision detected between player and obstacle!" << std::endl;
+    // For now, just remove the obstacle
+    obstacle->setForDelete();
 }
