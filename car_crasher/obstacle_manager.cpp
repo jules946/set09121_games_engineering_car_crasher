@@ -18,6 +18,7 @@ const std::string& ObstacleManager::getRandomSprite() const {
 }
 
 void ObstacleManager::update(double dt) {
+
     // Debug print to check spawn timing
     std::cout << "Time since last spawn: " << _spawnClock.getElapsedTime().asSeconds() << std::endl;
 
