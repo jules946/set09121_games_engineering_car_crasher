@@ -9,6 +9,7 @@
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 #include "background_manager.h"
+#include "cmp_hit_box.h"
 #include "obstacle_manager.h"
 
 using namespace sf;
@@ -70,23 +71,24 @@ void GameScene::load() {
     // _obstacleManager->spawnInitalObstacles();
 
     // Create player
-    const auto player = make_shared<Entity>();
+    _player = make_shared<Entity>();
 
     // Add sprite component to player
-    const auto s = player->addComponent<SpriteComponent>();
+    const auto s = _player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
 
     // Set initial position of player to second lane
-    player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
+    _player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
 
-    // Add sound and movement components to player
-    player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
-    player->addComponent<PlayerMovementComponent>(lanePositions);
+    // Add components to player
+    _player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
+    _player->addComponent<PlayerMovementComponent>(lanePositions);
+    _player->addComponent<HitboxComponent>(FloatRect(0, 0, s->getSprite().getLocalBounds().width, s->getSprite().getLocalBounds().height));
 
-    _entity_manager.list.push_back(player);
+    _entity_manager.list.push_back(_player);
 }
 
 void GameScene::update(const double dt) {
@@ -94,6 +96,9 @@ void GameScene::update(const double dt) {
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
+
+    // Update collision manager
+    CollisionManager::checkPlayerCollisions(_entity_manager, _player);
 
     // Update obstacle manager
     if (_obstacleManager) {
