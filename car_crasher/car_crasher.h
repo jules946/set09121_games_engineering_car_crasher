@@ -4,6 +4,7 @@
 #include "obstacle_manager.h"
 #include "background_manager.h"
 #include "collision_manager.h"
+#include "game_UI_Manager.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
@@ -31,6 +32,9 @@ private:
     backgroundManager _backgroundManager;
     std::shared_ptr<Entity> _player;
     CollisionManager _collisionManager;
+    gameUIManager _gameUIManager;
+    sf::Font font;
+    sf::Text livesText;
 public:
     GameScene() : _obstacleManager(nullptr) {}
     void update(double dt) override;

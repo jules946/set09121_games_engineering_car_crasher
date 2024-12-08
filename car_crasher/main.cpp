@@ -47,6 +47,9 @@ int main() {
         while (window.isOpen()) {
             Event event;
             while (window.pollEvent(event)) {
+                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                    window.close();
+                }
                 if (event.type == Event::Closed) {
                     window.close(); // Handle window close event
                 }
