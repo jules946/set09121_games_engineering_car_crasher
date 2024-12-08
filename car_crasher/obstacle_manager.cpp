@@ -2,6 +2,7 @@
 #include "cmp_actor_movement.h"
 #include "cmp_sprite.h"
 #include "game_config.h"
+#include "cmp_hit_box.h"
 
 ObstacleManager::ObstacleManager(EntityManager& entityManager)
     : _entityManager(entityManager),
@@ -20,7 +21,7 @@ const std::string& ObstacleManager::getRandomSprite() const {
 void ObstacleManager::update(double dt) {
 
     // Debug print to check spawn timing
-    std::cout << "Time since last spawn: " << _spawnClock.getElapsedTime().asSeconds() << std::endl;
+    // std::cout << "Time since last spawn: " << _spawnClock.getElapsedTime().asSeconds() << std::endl;
 
     if (_spawnClock.getElapsedTime().asSeconds() > _spawnInterval) {
         if (auto obstacle = createObstacle()) {
@@ -54,5 +55,9 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     int lane = movement->getLane();
     obstacle->setPosition(sf::Vector2f(lanePositions[lane], -50.f));
 
+
+    // Add hitbox component
+    const auto& bounds = sprite->getSprite().getLocalBounds();
+    obstacle->addComponent<HitboxComponent>(sf::FloatRect(0, 0, bounds.width, bounds.height));
     return obstacle;
 }

@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "obstacle_manager.h"
 #include "background_manager.h"
+#include "collision_manager.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
@@ -28,7 +29,8 @@ class GameScene final : public Scene {
 private:
     std::unique_ptr<ObstacleManager> _obstacleManager;
     backgroundManager _backgroundManager;
-
+    std::shared_ptr<Entity> _player;
+    CollisionManager _collisionManager;
 public:
     GameScene() : _obstacleManager(nullptr) {}
     void update(double dt) override;
