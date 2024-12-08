@@ -8,9 +8,7 @@
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
-#include "obstacles.h"
 #include "background_manager.h"
-#include "obstacle_manager.h"
 #include "obstacle_manager.h"
 
 using namespace sf;
@@ -62,27 +60,29 @@ void GameScene::load() {
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
 
     // Add obstacle sprites
+    // TODO: Just have 1 function that adds all sprites at initialization?
     _obstacleManager->addObstacleSprite("res/img/Construction_sign.png");
     _obstacleManager->addObstacleSprite("res/img/Street_baracade.png");
     _obstacleManager->addObstacleSprite("res/img/Street_baracade_2.png");
     _obstacleManager->addObstacleSprite("res/img/Traffic_cone.png");
-
-
+    // TODO: Make some obstacles spawn right at the start of the game
+    // something like?
+    // _obstacleManager->spawnInitalObstacles();
 
     // Create player
     const auto player = make_shared<Entity>();
 
-    // Add sprite component
+    // Add sprite component to player
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
 
-    // Set initial position to middle lane
+    // Set initial position of player to second lane
     player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
 
-    // Add sound and movement components
+    // Add sound and movement components to player
     player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
     player->addComponent<PlayerMovementComponent>(lanePositions);
 
