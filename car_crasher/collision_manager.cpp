@@ -4,10 +4,12 @@
 #include "cmp_hit_box.h"
 
 void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const std::shared_ptr<Entity>& player) {
+    // check if player exists
     if (!player) return;
 
-    auto playerBB = player->getComponent<HitboxComponent>();
-    if (!playerBB) return;
+    // check if player hitbox exists
+    auto playerHB = player->getComponent<HitboxComponent>();
+    if (!playerHB) return;
 
     auto& entities = entityManager.list;
     for (const auto& entity : entities) {
@@ -17,7 +19,7 @@ void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const
         if (!obstacleBB) continue;
 
         // Check for collision between player and obstacle
-        if (playerBB->getBounds().intersects(obstacleBB->getBounds())) {
+        if (playerHB->getBounds().intersects(obstacleBB->getBounds())) {
             handlePlayerCollision(player, entity);
         }
     }
