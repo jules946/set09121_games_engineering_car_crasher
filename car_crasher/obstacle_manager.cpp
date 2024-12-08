@@ -1,3 +1,4 @@
+//obstacle_manager.cpp
 #include "obstacle_manager.h"
 #include "cmp_actor_movement.h"
 #include "cmp_sprite.h"
@@ -12,6 +13,15 @@ ObstacleManager::ObstacleManager(EntityManager& entityManager)
 
 void ObstacleManager::addObstacleSprite(const std::string& spritePath) {
     _obstacleSprites.push_back(spritePath);
+}
+
+void ObstacleManager::initializeSprites() {
+    _obstacleSprites = {
+        "res/img/Construction_sign.png",
+        "res/img/Street_baracade.png",
+        "res/img/Street_baracade_2.png",
+        "res/img/Traffic_cone.png"
+    };
 }
 
 const std::string& ObstacleManager::getRandomSprite() const {

@@ -58,16 +58,18 @@ void GameScene::load() {
 
     // Initialize obstacle manager
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
+    _obstacleManager->initializeSprites(); // Single function call to add all sprites
 
+
+    /*
     // Add obstacle sprites
-    // TODO: Just have 1 function that adds all sprites at initialization?
+    // TODO: Just have 1 function that adds all sprites at initialization? DONE
     _obstacleManager->addObstacleSprite("res/img/Construction_sign.png");
     _obstacleManager->addObstacleSprite("res/img/Street_baracade.png");
     _obstacleManager->addObstacleSprite("res/img/Street_baracade_2.png");
     _obstacleManager->addObstacleSprite("res/img/Traffic_cone.png");
-    // TODO: Make some obstacles spawn right at the start of the game
-    // something like?
-    // _obstacleManager->spawnInitalObstacles();
+
+    */
 
     // Create player
     _player = make_shared<Entity>();
