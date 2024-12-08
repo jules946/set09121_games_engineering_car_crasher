@@ -11,6 +11,7 @@
 #include "background_manager.h"
 #include "cmp_hit_box.h"
 #include "obstacle_manager.h"
+#include "game_UI_Manager.h"
 
 using namespace sf;
 using namespace std;
@@ -35,8 +36,6 @@ void MenuScene::load() {
     // rendering and prevent blurriness
     text.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
     text.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 2.f));
-
-
 }
 
 void MenuScene::update(const double dt) {
@@ -89,6 +88,23 @@ void GameScene::load() {
     _player->addComponent<HitboxComponent>(FloatRect(0, 0, s->getSprite().getLocalBounds().width, s->getSprite().getLocalBounds().height));
 
     _entity_manager.list.push_back(_player);
+
+    // UI for lives etc
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+    livesText.setFont(font); // Set the font of the text
+    livesText.setCharacterSize(24); // Set the character size
+    livesText.setFillColor(sf::Color::White); // Set the text color
+    livesText.setString("Lives:");
+    // Get text bounds
+    const FloatRect bounds = livesText.getLocalBounds();
+
+    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
+    // rendering and prevent blurriness
+    livesText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
+    livesText.setPosition(gameWidth - 270.f, 40.f);
+    _gameUIManager.loadLives(_entity_manager, livesInt);
 }
 
 void GameScene::update(const double dt) {
@@ -104,11 +120,14 @@ void GameScene::update(const double dt) {
     if (_obstacleManager) {
         _obstacleManager->update(dt);
     }
+    
+    _gameUIManager.update(dt, _entity_manager, livesInt);
 
     Scene::update(dt);
 }
 
 // Add all entities to the renderer queue
 void GameScene::render() {
+    Renderer::queue(&livesText);
     Scene::render();
 }

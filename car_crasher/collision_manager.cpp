@@ -1,6 +1,7 @@
 // CollisionSystem.cpp
 #include "collision_manager.h"
 
+
 #include "cmp_hit_box.h"
 
 void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const std::shared_ptr<Entity>& player) {
@@ -30,4 +31,7 @@ void CollisionManager::handlePlayerCollision(const std::shared_ptr<Entity>& play
     std::cout << "Collision detected between player and obstacle!" << std::endl;
     // For now, just remove the obstacle
     obstacle->setForDelete();
+
+    // Decrement livesInt to remove a heart
+    livesInt--;
 }

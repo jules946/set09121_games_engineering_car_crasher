@@ -26,4 +26,7 @@ constexpr std::array<float, numLanes> lanePositions = {
 constexpr float tileScaleY = 2.0f;
 constexpr float overlap = 1.0f;
 
+// Lives count
+extern int livesInt;
+
 #endif
