@@ -20,3 +20,14 @@ public:
     void update(double dt) override;
 };
 
+
+class ObstacleMovementComponent final : public ActorMovementComponent {
+protected:
+    int _lane;
+
+public:
+    explicit ObstacleMovementComponent(Entity* p);
+    void update(double dt) override;
+    int getLane() const { return _lane; }
+};
+

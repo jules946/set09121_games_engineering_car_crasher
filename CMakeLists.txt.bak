@@ -62,7 +62,7 @@ list(APPEND SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacles.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacles.h")
 add_executable(CAR_CRASHER ${SOURCES})
-target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS})
+target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS} "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher")
 target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)
 
 # Copy the OpenAL32.dll file to the output directory to get audio working

@@ -8,8 +8,8 @@
 #include "ecm.h"
 #include "cmp_sprite.h"
 #include "system_renderer.h"
-#include "obstacles.h"
 #include "background_manager.h"
+#include "obstacle_manager.h"
 
 using namespace sf;
 using namespace std;
@@ -17,8 +17,6 @@ using namespace std;
 std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
-
-constexpr float GameScene::_lanePositions[3];
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -58,20 +56,33 @@ void GameScene::load() {
     // add background
     _backgroundManager.loadBackground(_entity_manager);
 
+    // Initialize obstacle manager
+    _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
+
+    // Add obstacle sprites
+    // TODO: Just have 1 function that adds all sprites at initialization?
+    _obstacleManager->addObstacleSprite("res/img/Construction_sign.png");
+    _obstacleManager->addObstacleSprite("res/img/Street_baracade.png");
+    _obstacleManager->addObstacleSprite("res/img/Street_baracade_2.png");
+    _obstacleManager->addObstacleSprite("res/img/Traffic_cone.png");
+    // TODO: Make some obstacles spawn right at the start of the game
+    // something like?
+    // _obstacleManager->spawnInitalObstacles();
+
     // Create player
     const auto player = make_shared<Entity>();
 
-    // Add sprite component
+    // Add sprite component to player
     const auto s = player->addComponent<SpriteComponent>();
     s->setTexture("res/img/BlueCar.png");
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
 
-    // Set initial position to middle lane
+    // Set initial position of player to second lane
     player->setPosition(Vector2f(lanePositions[1], gameHeight / 2.f));
 
-    // Add sound and movement components
+    // Add sound and movement components to player
     player->addComponent<SoundEffectComponent>("res/sound/tires_squal_loop.wav");
     player->addComponent<PlayerMovementComponent>(lanePositions);
 
@@ -79,15 +90,14 @@ void GameScene::load() {
 }
 
 void GameScene::update(const double dt) {
+
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
 
-    // Spawn new obstacle every spawnInterval seconds
-    if (spawnClock.getElapsedTime().asSeconds() > spawnInterval) {
-        const auto obstacle = Obstacle::makeObstacle(_lanePositions);
-        _entity_manager.list.push_back(obstacle);
-        spawnClock.restart();
+    // Update obstacle manager
+    if (_obstacleManager) {
+        _obstacleManager->update(dt);
     }
 
     Scene::update(dt);
