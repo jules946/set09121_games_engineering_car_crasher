@@ -18,14 +18,6 @@
 using namespace sf;
 using namespace std;
 
-/* Now in scene.cpp
-std::shared_ptr<Scene> activeScene;
-std::shared_ptr<Scene> menuScene;
-std::shared_ptr<Scene> gameScene;
-*/
-// std::shared_ptr<Scene> activeScene;
-// std::shared_ptr<Scene> menuScene;
-// std::shared_ptr<Scene> gameScene;
 
 // MenuScene class implementation
 void MenuScene::load() {
