@@ -1,7 +1,6 @@
 // cmp_menu.cpp
 #include "cmp_menu.h"
 #include "system_renderer.h"
-#include "game_config.h"
 #include "scene.h"
 
 // TextComponent implementation
@@ -48,14 +47,10 @@ void TextComponent::centerOrigin() {
 }
 
 // MenuComponent implementation
-MenuComponent::MenuComponent(Entity* p,
-                           std::shared_ptr<Scene>& activeScene,
-                           std::shared_ptr<Scene>& gameScene)
+MenuComponent::MenuComponent(Entity* p)
     : Component(p),
       _state(MenuState::TITLE),
-      _selectedOption(0),
-      _activeScene(activeScene),
-      _gameScene(gameScene) {    std::cout << "MenuComponent Constructor - gameScene: " << _gameScene << std::endl;}
+      _selectedOption(0) { }
 
 void MenuComponent::update(double dt) {
     static bool upPressed = false;
@@ -96,13 +91,13 @@ void MenuComponent::update(double dt) {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed && _selectedOption == 0) {
 
-            std::cout << "GameScene pointer: " << _gameScene << std::endl;
-            std::cout << "GameScene entities: " << _gameScene->getEnts().size() << std::endl;
+            std::cout << "GameScene pointer: " << gameScene << std::endl;
+            std::cout << "GameScene entities: " << gameScene->getEnts().size() << std::endl;
 
 
             // Add debug print
             std::cout << "Attempting scene transition" << std::endl;
-            activeScene = _gameScene;  // Use global activeScene instead of _activeScene
+            activeScene = gameScene;  // Use global activeScene instead of _activeScene
             //_activeScene = _gameScene;
             returnPressed = true;
         }

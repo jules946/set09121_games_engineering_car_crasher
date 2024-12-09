@@ -28,16 +28,10 @@ protected:
     MenuState _state;
     size_t _selectedOption;
     std::vector<std::shared_ptr<Entity>> _menuItems;
-    std::shared_ptr<Scene> _activeScene;    // Remove &
-    std::shared_ptr<Scene> _gameScene;      // Remove &
-
-    // std::shared_ptr<Scene>& _activeScene;    // Reference to active scene
-    // std::shared_ptr<Scene>& _gameScene;      // Reference to game scene
 
 public:
-    explicit MenuComponent(Entity* p,
-                          std::shared_ptr<Scene>& activeScene,
-                          std::shared_ptr<Scene>& gameScene);
+    explicit MenuComponent(Entity *p);
+
     void update(double dt) override;
     void render() override {}
     void addMenuItem(const std::shared_ptr<Entity>& item);

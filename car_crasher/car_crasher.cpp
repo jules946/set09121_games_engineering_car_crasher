@@ -23,6 +23,9 @@ std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
 */
+// std::shared_ptr<Scene> activeScene;
+// std::shared_ptr<Scene> menuScene;
+// std::shared_ptr<Scene> gameScene;
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -35,7 +38,7 @@ void MenuScene::load() {
 
     // Create menu controller entity
     auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene);
+    auto menuControl = menuEntity->addComponent<MenuComponent>();
     // Debug after
     std::cout << "After component creation - gameScene: " << gameScene << std::endl;
 
