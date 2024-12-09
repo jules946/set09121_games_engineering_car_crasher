@@ -1,3 +1,4 @@
+//game_UI_Manager.h
 #ifndef GAME_UI_MANAGER_H
 #define GAME_UI_MANAGER_H
 
@@ -13,6 +14,7 @@ private:
 public:
     void loadLives(EntityManager& entityManager, int livesInt);
     void update(double dt, EntityManager& entityManager, int livesInt);
+    void resetLives() { livesInt = 3; } // Reset hearts when quitting the game
 };
 
 

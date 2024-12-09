@@ -41,4 +41,16 @@ public:
     void update(double dt) override;
     void render() override;
     void load() override;
+    void pauseSounds();
+};
+
+class PauseScene : public Scene {
+protected:
+    sf::Font font;
+    std::vector<std::shared_ptr<Entity>> _menuItems;
+
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
 };

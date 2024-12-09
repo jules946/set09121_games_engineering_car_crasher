@@ -17,6 +17,10 @@ void Load() {
     gameScene->load();
     std::cout << "GameScene loaded: " << gameScene << std::endl;
 
+    pauseScene = std::make_shared<PauseScene>();
+
+    pauseScene->load();
+
     menuScene->load();
     activeScene = menuScene;
 }

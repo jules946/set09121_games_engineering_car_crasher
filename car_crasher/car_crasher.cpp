@@ -15,6 +15,20 @@
 #include "game_UI_Manager.h"
 #include "cmp_menu.h"
 
+
+// TODO
+// Obstacle Manager -- Alessio
+//- add good obstacles e.g. heart
+//- if car drives over heart ++lives
+
+//Main Menu -- Alessio
+//- Add text to let player know to click a button to start game
+//- Add car change functionality
+//- Add keybind functionality
+//- Add difficulity functionality
+//- Add pause menu to gameScene
+
+
 using namespace sf;
 using namespace std;
 
@@ -30,7 +44,7 @@ void MenuScene::load() {
 
     // Create menu controller entity
     auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>();
+    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::MAIN);
     // Debug after
     std::cout << "After component creation - gameScene: " << gameScene << std::endl;
 
@@ -148,8 +162,9 @@ void GameScene::load() {
 void GameScene::update(const double dt) {
 
     std::cout << "Game scene update" << std::endl;
-    if (Keyboard::isKeyPressed(Keyboard::Tab)) {
-        activeScene = menuScene;
+    if (Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
+        pauseSounds();
+        activeScene = pauseScene;
     }
 
     // Update collision manager
@@ -168,5 +183,71 @@ void GameScene::update(const double dt) {
 // Add all entities to the renderer queue
 void GameScene::render() {
     Renderer::queue(&livesText);
+    Scene::render();
+}
+
+
+// Created to stop the screeching sound while the game is paused
+void GameScene::pauseSounds() {
+    if (auto sound = _player->getComponent<SoundEffectComponent>()) {
+        sound->stopSound();
+    }
+
+    for (auto& entity : _entity_manager.list) {
+        if (auto sound = entity->getComponent<SoundEffectComponent>()) {
+            sound->stopSound();
+        }
+    }
+}
+
+void PauseScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    // Create pause title
+    auto title = std::make_shared<Entity>();
+    auto titleText = title->addComponent<TextComponent>("Game Paused");
+    titleText->setCharacterSize(48);
+    title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
+    titleText->centerOrigin();
+
+    // Create question text
+    auto question = std::make_shared<Entity>();
+    auto questionText = question->addComponent<TextComponent>("Do you want to quit this game session?");
+    questionText->setCharacterSize(32);
+    question->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
+    questionText->centerOrigin();
+    // Create menu options
+    std::vector<std::string> options = {
+        "Yes, please",
+        "No, go back to the game"
+    };
+
+    float yPos = gameHeight / 1.5f;
+    auto menuEntity = std::make_shared<Entity>();
+    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::PAUSE);
+
+    for (const auto& opt : options) {
+        auto item = std::make_shared<Entity>();
+        auto text = item->addComponent<TextComponent>(opt);
+        text->setCharacterSize(32);
+        item->setPosition(Vector2f(gameWidth / 2.f, yPos));
+        text->centerOrigin();
+        menuControl->addMenuItem(item);
+        _entity_manager.list.push_back(item);
+        yPos += 60.f;
+    }
+
+    _entity_manager.list.push_back(title);
+    _entity_manager.list.push_back(question);
+    _entity_manager.list.push_back(menuEntity);
+}
+
+void PauseScene::update(double dt) {
+    Scene::update(dt);
+}
+
+void PauseScene::render() {
     Scene::render();
 }
