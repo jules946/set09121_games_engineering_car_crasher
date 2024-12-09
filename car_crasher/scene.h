@@ -1,6 +1,5 @@
 //scene.h
 #pragma once
-
 #include "entity_manager.h"
 
 class Scene {
@@ -16,3 +15,8 @@ public:
 protected:
     EntityManager _entity_manager;
 };
+
+
+extern std::shared_ptr<Scene> activeScene;
+extern std::shared_ptr<Scene> menuScene;
+extern std::shared_ptr<Scene> gameScene;

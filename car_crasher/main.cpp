@@ -9,15 +9,15 @@ using namespace sf;
 using namespace std;
 
 void Load() {
-    // Create menu and game scenes
-    menuScene = std::make_shared<MenuScene>();
     gameScene = std::make_shared<GameScene>();
+    std::cout << "GameScene created: " << gameScene << std::endl;
 
-    // load scenes
-    menuScene->load();
+    menuScene = std::make_shared<MenuScene>();
+
     gameScene->load();
+    std::cout << "GameScene loaded: " << gameScene << std::endl;
 
-    // start at main menu
+    menuScene->load();
     activeScene = menuScene;
 }
 

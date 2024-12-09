@@ -8,10 +8,11 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
+/* Now in scene.cpp
 extern std::shared_ptr<Scene> activeScene;
 extern std::shared_ptr<Scene> menuScene;
 extern std::shared_ptr<Scene> gameScene;
-
+*/
 // Forward declaration of MenuScene class
 class MenuScene final : public Scene {
 private:

@@ -1,5 +1,6 @@
 //car_crasher.cpp
 #include <cmath>
+#include <memory>
 
 #include "car_crasher.h"
 #include "cmp_player_movement.h"
@@ -12,23 +13,65 @@
 #include "cmp_hit_box.h"
 #include "obstacle_manager.h"
 #include "game_UI_Manager.h"
+#include "cmp_menu.h"
 
 using namespace sf;
 using namespace std;
 
+/* Now in scene.cpp
 std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
 std::shared_ptr<Scene> gameScene;
+*/
 
 // MenuScene class implementation
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
-    text.setFont(font); // Set the font of the text
-    text.setCharacterSize(24); // Set the character size
-    text.setFillColor(sf::Color::White); // Set the text color
-    text.setString("Car Crasher");
+
+    // Debug before creating component
+    std::cout << "Before component creation - gameScene: " << gameScene << std::endl;
+
+    // Create menu controller entity
+    auto menuEntity = std::make_shared<Entity>();
+    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene);
+    // Debug after
+    std::cout << "After component creation - gameScene: " << gameScene << std::endl;
+
+    // Create title
+    auto title = std::make_shared<Entity>();
+    auto titleText = title->addComponent<TextComponent>("Car Crasher");
+    titleText->setCharacterSize(48);
+    title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
+    titleText->centerOrigin();
+
+    // Create menu items
+    std::vector<std::string> options = {
+        "Play Game",
+        "Choose Different Car",
+        "Difficulty",
+        "Key Binds"
+    };
+
+    _entity_manager.list.push_back(menuEntity);
+    _entity_manager.list.push_back(title);
+
+    float yPos = gameHeight / 2.f;
+    for (const auto& opt : options) {
+        auto item = std::make_shared<Entity>();
+        auto text = item->addComponent<TextComponent>(opt);
+        text->setCharacterSize(32);
+        item->setPosition(Vector2f(gameWidth / 2.f, yPos));
+        text->centerOrigin();
+        menuControl->addMenuItem(item);
+        _entity_manager.list.push_back(item);
+        yPos += 60.f;
+    }
+}
+
+
+/*
     // Get text bounds
     const FloatRect bounds = text.getLocalBounds();
 
@@ -36,14 +79,12 @@ void MenuScene::load() {
     // rendering and prevent blurriness
     text.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
     text.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 2.f));
-}
+
+    */
+
 
 void MenuScene::update(const double dt) {
-    if (Keyboard::isKeyPressed(Keyboard::Space)) {
-        activeScene = gameScene;
-    }
-    Scene::update(dt);
-    // text.setString("Car Crasher");
+    Scene::update(dt);  // Keep this to update all entities/components
 }
 
 void MenuScene::render() {
@@ -111,6 +152,7 @@ void GameScene::load() {
 
 void GameScene::update(const double dt) {
 
+    std::cout << "Game scene update" << std::endl;
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
