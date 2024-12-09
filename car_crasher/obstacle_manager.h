@@ -1,10 +1,4 @@
-#pragma once
-#include "ecm.h"
-#include "entity_manager.h"
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <string>
-
+//obstacle_manager.h
 #pragma once
 #include "ecm.h"
 #include "entity_manager.h"
@@ -25,6 +19,7 @@ public:
     void addObstacleSprite(const std::string& spritePath);
     void setSpawnInterval(float interval) { _spawnInterval = interval; }
     void update(double dt);
+    void initializeSprites();
 
 private:
     std::shared_ptr<Entity> createObstacle();

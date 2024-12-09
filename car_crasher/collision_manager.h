@@ -4,6 +4,7 @@
 #include <memory>
 #include "ecm.h"
 #include "entity_manager.h"
+#include "game_config.h"
 
 class CollisionManager {
 public:

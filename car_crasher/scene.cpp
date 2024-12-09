@@ -1,6 +1,14 @@
 // scene.cpp
-
 #include "scene.h"
+
+std::shared_ptr<Scene> activeScene;
+std::shared_ptr<Scene> menuScene;
+std::shared_ptr<Scene> gameScene;
+
+// for testing menu
+std::vector<std::shared_ptr<Entity>>& Scene::getEnts() {
+    return _entity_manager.list;
+}
 
 // Load all entities in the scene
 // Will be overridden per scene
