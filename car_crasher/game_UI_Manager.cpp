@@ -9,7 +9,7 @@ int livesInt = 3;
 
 void gameUIManager::loadLives(EntityManager& entityManager, int livesInt) {
   // TODO add heart image
-    if (!livesTexture.loadFromFile("res/img/BlueCar.png")) {
+    if (!livesTexture.loadFromFile("res/img/heartLife.png")) {
         throw std::runtime_error("Failed to load road texture!");
     }
 
