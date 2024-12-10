@@ -169,7 +169,8 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_cop);
 
-    
+    _gameUIManager.loadPauseText(font, pauseText);
+
     // UI for lives etc
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
@@ -206,7 +207,7 @@ void GameScene::update(const double dt) {
     }
     // std::cout << "Game scene update" << std::endl;
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
-        activeScene = menuScene;
+        activeScene = pauseScene;
     }
     
     // Update collision manager
@@ -237,6 +238,7 @@ void GameScene::render() {
     Scene::render();
     Renderer::queue(&livesText);
     Renderer::queue(&scoreText);
+    Renderer::queue(&pauseText);
 }
 
 
@@ -327,6 +329,57 @@ void GameOverScene::update(double dt) {
 void GameOverScene::render() {
     Renderer::queue(&gameOverText);
     Renderer::queue(&gameOverScoreText);
+    Renderer::queue(&promptText);
+    Scene::render();
+}
+
+void KeyBindScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    titleText.setFont(font);
+    titleText.setString("Key Binds");
+    titleText.setCharacterSize(48);
+    titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
+    titleText.setOrigin(titleText.getLocalBounds().width / 2.f, titleText.getLocalBounds().height / 2.f);
+
+    leftKeyText.setFont(font);
+    leftKeyText.setString("Left Key: A");
+    leftKeyText.setCharacterSize(32);
+    leftKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f - 50.f);
+    leftKeyText.setOrigin(leftKeyText.getLocalBounds().width / 2.f, leftKeyText.getLocalBounds().height / 2.f);
+
+    rightKeyText.setFont(font);
+    rightKeyText.setString("Right Key: D");
+    rightKeyText.setCharacterSize(32);
+    rightKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f + 50.f);
+    rightKeyText.setOrigin(rightKeyText.getLocalBounds().width / 2.f, rightKeyText.getLocalBounds().height / 2.f);
+
+    promptText.setFont(font);
+    promptText.setString("Press Backspace to return to menu");
+    promptText.setCharacterSize(24);
+    promptText.setPosition(gameWidth / 2.f, gameHeight * 3.f / 4.f);
+    promptText.setOrigin(promptText.getLocalBounds().width / 2.f, promptText.getLocalBounds().height / 2.f);
+
+    // Set colors
+    titleText.setFillColor(sf::Color::White);
+    leftKeyText.setFillColor(sf::Color::White);
+    rightKeyText.setFillColor(sf::Color::White);
+    promptText.setFillColor(sf::Color::White);
+}
+
+void KeyBindScene::update(double dt) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) {  // Changed from Escape to BackSpace
+        activeScene = menuScene;
+    }
+    Scene::update(dt);
+}
+
+void KeyBindScene::render() {
+    Renderer::queue(&titleText);
+    Renderer::queue(&leftKeyText);
+    Renderer::queue(&rightKeyText);
     Renderer::queue(&promptText);
     Scene::render();
 }

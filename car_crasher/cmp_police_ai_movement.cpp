@@ -1,4 +1,4 @@
-// cmp_police_movement.cpp
+// cmp_police_ai_movement.cpp
 #include "cmp_police_ai_movement.h"
 #include "cmp_sprite.h"
 
@@ -6,15 +6,17 @@
 
 #include "entity_manager.h"
 
-PolicePursuitComponent::PolicePursuitComponent(Entity* p, const std::array<float, 4>& lanePositions,
-                                               const std::shared_ptr<Entity>& player,
-                                               EntityManager* entityManager)
-   : ActorMovementComponent(p), _entityManager(entityManager), _player(player),
-     _lanePositions(std::vector<float>(lanePositions.begin(), lanePositions.end())),
-     _currentLane(1), _isChangingLane(false), _timeSinceLastDecision(999.0f) { // Force immediate decision
-    _targetX = _lanePositions[_currentLane];
-    setSpeed(200.0f);
-}
+PolicePursuitComponent::PolicePursuitComponent(Entity* p,
+                                            const std::array<float, 4>& lanePositions,
+                                            const std::shared_ptr<Entity>& player,
+                                            EntityManager* entityManager)
+   : ActorMovementComponent(p),
+     _entityManager(entityManager),
+     _player(player),
+     _lanePositions(lanePositions.begin(), lanePositions.end()),
+     _currentLane(1),
+     _isChangingLane(false),
+     _targetX(_lanePositions[_currentLane]) {}
 
 bool PolicePursuitComponent::isObstacleInLane(const float laneX, const EntityManager& em) const {
     const auto pos = _parent->getPosition();

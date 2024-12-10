@@ -1,10 +1,9 @@
 //cmp_player_movement.cpp
-
+#include "cmp_key_binds.h"
 #include "cmp_player_movement.h"
 #include "cmp_sprite.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <cmath>
-
 #include "cmp_sound_effect.h"
 
 PlayerMovementComponent::PlayerMovementComponent(Entity* p, const std::array<float, 4>& lanePositions,
@@ -22,23 +21,23 @@ void PlayerMovementComponent::update(const double dt) {
         _soundEffect = _parent->getComponent<SoundEffectComponent>();
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && _currentLane > 0 &&
+    if (sf::Keyboard::isKeyPressed(KeyBindComponent::getLeftKey()) && _currentLane > 0 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
         _currentLane--;
         _targetX = _lanePositions[_currentLane];
         if (_soundEffect) {
             _soundEffect->playSound();
         }
-    }
+        }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && _currentLane < numLanes - 1 &&
+    if (sf::Keyboard::isKeyPressed(KeyBindComponent::getRightKey()) && _currentLane < numLanes - 1 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
         _currentLane++;
         _targetX = _lanePositions[_currentLane];
         if (_soundEffect) {
             _soundEffect->playSound();
         }
-    }
+        }
 
     if (std::abs(_targetX - _parent->getPosition().x) > 1.0f) {
         const auto moveDistance = static_cast<float>((_targetX - _parent->getPosition().x) * _moveSpeed * dt);

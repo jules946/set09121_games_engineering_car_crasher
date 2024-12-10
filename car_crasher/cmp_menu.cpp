@@ -111,8 +111,12 @@ void MenuComponent::update(double dt) {
         if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) downPressed = false;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
-            if (_type == MenuType::MAIN && _selectedOption == 0) {
-                activeScene = gameScene;  // Start game
+            if (_type == MenuType::MAIN) {
+                if (_selectedOption == 0) {
+                    activeScene = gameScene;  // Start game
+                }
+                else if (_selectedOption == 3) {  // Key Binds option
+                    activeScene = keyBindScene;                }
             }
             else if (_type == MenuType::PAUSE) {
                 if (_selectedOption == 0) {  // "Yes, please"

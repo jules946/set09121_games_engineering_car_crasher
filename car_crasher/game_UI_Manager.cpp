@@ -106,6 +106,17 @@ void gameUIManager::loadScoreText(Font& font, Text& scoreText) {
     scoreText.setPosition(gameWidth - 240.f, 100.f);
 }
 
+void gameUIManager::loadPauseText(Font& font, Text& pauseText) {
+    pauseText.setFont(font);
+    pauseText.setCharacterSize(24);
+    pauseText.setFillColor(sf::Color::White);
+    pauseText.setString("Press Tab to pause");
+
+    const FloatRect bounds = pauseText.getLocalBounds();
+    pauseText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
+    pauseText.setPosition(80.f, 40.f);
+}
+
 void gameUIManager::loadGameOverText(Font& font, Text& gameOverText, Text& gameOverScoreText, Text& promptText) {
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(96);

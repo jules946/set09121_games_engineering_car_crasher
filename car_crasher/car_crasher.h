@@ -39,6 +39,7 @@ private:
     sf::Font font;
     sf::Text livesText;
     sf::Text scoreText;
+    sf::Text pauseText;
     bool _firstUpdate = true;
 public:
     GameScene() : _obstacleManager(nullptr) {}
@@ -66,6 +67,20 @@ private:
     sf::Text gameOverScoreText;
     sf::Text promptText;
     gameUIManager _gameUIManager;
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+};
+
+class KeyBindScene : public Scene {
+private:
+    sf::Font font;
+    sf::Text titleText;
+    sf::Text leftKeyText;
+    sf::Text rightKeyText;
+    sf::Text promptText;
+
 public:
     void load() override;
     void update(double dt) override;

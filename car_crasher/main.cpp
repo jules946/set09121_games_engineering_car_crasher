@@ -4,6 +4,8 @@
 #include "car_crasher.h"
 #include "game_config.h"
 #include "system_renderer.h"
+#include "scene.h"
+
 
 using namespace sf;
 using namespace std;
@@ -19,11 +21,12 @@ void Load() {
 
     pauseScene = std::make_shared<PauseScene>();
     gameOverScene = std::make_shared<GameOverScene>();
-
+    keyBindScene = std::make_shared<KeyBindScene>();
     pauseScene->load();
 
     menuScene->load();
     gameOverScene->load();
+    keyBindScene->load();
 
     activeScene = menuScene;
 }

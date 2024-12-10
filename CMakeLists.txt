@@ -60,6 +60,7 @@ file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
 # Explicitly add obstacle files
 # Explicitly add files
 list(APPEND SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/cmp_police_ai_movement.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/scene.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacle_manager.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/background_manager.cpp"

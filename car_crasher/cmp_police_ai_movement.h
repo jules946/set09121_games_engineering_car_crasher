@@ -1,4 +1,4 @@
-// cmp_police_movement.h
+// cmp_police_ai_movement.h
 #pragma once
 #include "cmp_actor_movement.h"
 #include "ecm.h"
