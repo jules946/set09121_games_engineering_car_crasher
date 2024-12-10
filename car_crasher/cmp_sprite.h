@@ -8,6 +8,7 @@ class SpriteComponent final : public Component {
 protected:
     std::shared_ptr<sf::Sprite> _sprite;
     std::shared_ptr<sf::Texture> _texture;
+    std::string _texturePath;
 public:
     SpriteComponent() = delete;
     explicit SpriteComponent(Entity *p);
@@ -16,6 +17,7 @@ public:
     void render() override;
 
     sf::Sprite &getSprite() const;
+    std::string getTexturePath() const { return _texturePath; }
 
     void setTexture(const std::string &textureFile);
 };

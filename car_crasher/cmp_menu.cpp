@@ -1,7 +1,11 @@
 // cmp_menu.cpp
 #include "cmp_menu.h"
+
+#include "car_crasher.h"
+#include "game_config.h"
 #include "system_renderer.h"
 #include "scene.h"
+#include "game_UI_Manager.h"
 
 // TextComponent implementation
 TextComponent::TextComponent(Entity* p, const std::string& str)
@@ -46,11 +50,103 @@ void TextComponent::centerOrigin() {
                     std::round(bounds.height / 2.f));
 }
 
+
+
 // MenuComponent implementation
-MenuComponent::MenuComponent(Entity* p)
+MenuComponent::MenuComponent(Entity* p,
+                           std::shared_ptr<Scene>& activeScene,
+                           std::shared_ptr<Scene>& gameScene,
+                           MenuType type)
     : Component(p),
       _state(MenuState::TITLE),
-      _selectedOption(0) { }
+      _selectedOption(0),
+      _activeScene(activeScene),
+      _gameScene(gameScene),
+      _type(type) { }
+
+void MenuComponent::update(double dt) {
+    static bool upPressed = false;
+    static bool downPressed = false;
+    static bool spacePressed = false;
+    static bool returnPressed = false;
+    static sf::Clock inputDelay;
+
+    if (_type == MenuType::MAIN) {
+        // Main Menu Logic
+        if (_state == MenuState::TITLE) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
+                _state = MenuState::MAIN_MENU;
+                returnPressed = true;
+            }
+            else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+                returnPressed = false;
+            }
+        }
+    }
+    else if (_type == MenuType::PAUSE) {
+        // Pause Menu Logic - Always in PAUSE_MENU state
+        _state = MenuState::PAUSE_MENU;
+    }
+
+    // Common navigation code for both menu types
+    if (_state != MenuState::TITLE) {
+        if (inputDelay.getElapsedTime().asSeconds() > 0.15f) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !upPressed) {
+                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(false);
+                _selectedOption = (_selectedOption - 1 + _menuItems.size()) % _menuItems.size();
+                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(true);
+                upPressed = true;
+                inputDelay.restart();
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !downPressed) {
+                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(false);
+                _selectedOption = (_selectedOption + 1) % _menuItems.size();
+                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(true);
+                downPressed = true;
+                inputDelay.restart();
+            }
+        }
+
+        if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) upPressed = false;
+        if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) downPressed = false;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
+            if (_type == MenuType::MAIN && _selectedOption == 0) {
+                activeScene = gameScene;  // Start game
+            }
+            else if (_type == MenuType::PAUSE) {
+                if (_selectedOption == 0) {  // "Yes, please"
+                    gameScene = std::make_shared<GameScene>();
+                    livesInt = 3;  // Reset lives
+                    gameScene->load();
+                    activeScene = menuScene;
+                }
+                else if (_selectedOption == 1) {  // "No, go back to the game"
+                    activeScene = gameScene;
+                }
+            }
+            returnPressed = true;
+        }
+        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+            returnPressed = false;
+        }
+    }
+
+    // Update visibility
+    for (auto& item : _menuItems) {
+        item->setVisible(_state != MenuState::TITLE);
+    }
+}
+
+
+
+
+void MenuComponent::addMenuItem(const std::shared_ptr<Entity>& item) {
+    _menuItems.push_back(item);
+}
+
+
+/*
 
 void MenuComponent::update(double dt) {
     static bool upPressed = false;
@@ -106,12 +202,12 @@ void MenuComponent::update(double dt) {
         }
     }
 
+
+
     // Update visibility
     for (auto& item : _menuItems) {
         item->setVisible(_state == MenuState::MAIN_MENU);
     }
 }
 
-void MenuComponent::addMenuItem(const std::shared_ptr<Entity>& item) {
-    _menuItems.push_back(item);
-}
+*/

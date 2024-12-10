@@ -16,6 +16,20 @@
 #include "cmp_menu.h"
 #include "cmp_police_ai_movement.h"
 
+
+// TODO
+// Obstacle Manager -- Alessio
+//- add good obstacles e.g. heart
+//- if car drives over heart ++lives
+
+//Main Menu -- Alessio
+//- Add text to let player know to click a button to start game - Done
+//- Add car change functionality
+//- Add keybind functionality
+//- Add difficulity functionality
+//- Add pause menu to gameScene - Done
+
+
 using namespace sf;
 using namespace std;
 
@@ -31,7 +45,7 @@ void MenuScene::load() {
 
     // Create menu controller entity
     auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>();
+    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::MAIN);
     // Debug after
     std::cout << "After component creation - gameScene: " << gameScene << std::endl;
 
@@ -41,6 +55,7 @@ void MenuScene::load() {
     titleText->setCharacterSize(48);
     title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
     titleText->centerOrigin();
+
 
     // Create menu items
     std::vector<std::string> options = {
@@ -64,16 +79,38 @@ void MenuScene::load() {
         _entity_manager.list.push_back(item);
         yPos += 60.f;
     }
+
+    // Setup prompt text
+    promptText.setFont(font);
+    promptText.setString("Press Enter to continue or to select an item in the Menu. Up and Down to navigate the Menu");
+    promptText.setCharacterSize(24);
+    promptText.setFillColor(sf::Color::White);
+
+    // Center the prompt text
+    const FloatRect promptBounds = promptText.getLocalBounds();
+    promptText.setOrigin(std::round(promptBounds.width / 2.f),
+                        std::round(promptBounds.height / 2.f));
+    promptText.setPosition(std::round(gameWidth / 2.f),
+                          std::round(gameHeight - 100.f));
 }
 
 
 void MenuScene::update(const double dt) {
-    Scene::update(dt);  // Keep this to update all entities/components
+    // Blink the prompt text every 0.8 seconds
+    if (blinkClock.getElapsedTime().asSeconds() > 0.8f) {
+        showPrompt = !showPrompt;
+        blinkClock.restart();
+    }
+
+    Scene::update(dt);
 }
 
+
 void MenuScene::render() {
-    Renderer::queue(&text);
     Scene::render();
+    if (showPrompt) {
+        Renderer::queue(&promptText);
+    }
 }
 
 // GameScene class implementation
@@ -170,11 +207,121 @@ void GameScene::update(const double dt) {
     
     _gameUIManager.update(dt, _entity_manager, livesInt);
 
+    if (livesInt <= 0 && activeScene != gameOverScene) {
+        pauseSounds();
+        activeScene = gameOverScene;
+    }
+
     Scene::update(dt);
 }
 
 // Add all entities to the renderer queue
 void GameScene::render() {
     Renderer::queue(&livesText);
+    Scene::render();
+}
+
+
+// Created to stop the screeching sound while the game is paused
+void GameScene::pauseSounds() {
+    if (auto sound = _player->getComponent<SoundEffectComponent>()) {
+        sound->stopSound();
+    }
+
+    for (auto& entity : _entity_manager.list) {
+        if (auto sound = entity->getComponent<SoundEffectComponent>()) {
+            sound->stopSound();
+        }
+    }
+}
+
+void PauseScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    // Create pause title
+    auto title = std::make_shared<Entity>();
+    auto titleText = title->addComponent<TextComponent>("Game Paused");
+    titleText->setCharacterSize(48);
+    title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
+    titleText->centerOrigin();
+
+    // Create question text
+    auto question = std::make_shared<Entity>();
+    auto questionText = question->addComponent<TextComponent>("Do you want to quit this game session?");
+    questionText->setCharacterSize(32);
+    question->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
+    questionText->centerOrigin();
+    // Create menu options
+    std::vector<std::string> options = {
+        "Yes, please",
+        "No, go back to the game"
+    };
+
+    float yPos = gameHeight / 1.5f;
+    auto menuEntity = std::make_shared<Entity>();
+    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::PAUSE);
+
+    for (const auto& opt : options) {
+        auto item = std::make_shared<Entity>();
+        auto text = item->addComponent<TextComponent>(opt);
+        text->setCharacterSize(32);
+        item->setPosition(Vector2f(gameWidth / 2.f, yPos));
+        text->centerOrigin();
+        menuControl->addMenuItem(item);
+        _entity_manager.list.push_back(item);
+        yPos += 60.f;
+    }
+
+    _entity_manager.list.push_back(title);
+    _entity_manager.list.push_back(question);
+    _entity_manager.list.push_back(menuEntity);
+}
+
+void PauseScene::update(double dt) {
+    Scene::update(dt);
+}
+
+void PauseScene::render() {
+    Scene::render();
+}
+
+
+void GameOverScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    gameOverText.setFont(font);
+    gameOverText.setString("Game Over");
+    gameOverText.setCharacterSize(48);
+    gameOverText.setFillColor(sf::Color::Red);
+    gameOverText.setPosition(gameWidth / 2.f, gameHeight / 3.f);
+    gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2.f,
+                          gameOverText.getLocalBounds().height / 2.f);
+
+    promptText.setFont(font);
+    promptText.setString("Press Enter to go to the Main Menu");
+    promptText.setCharacterSize(24);
+    promptText.setFillColor(sf::Color::White);
+    promptText.setPosition(gameWidth / 2.f, gameHeight / 2.f);
+    promptText.setOrigin(promptText.getLocalBounds().width / 2.f,
+                        promptText.getLocalBounds().height / 2.f);
+}
+
+void GameOverScene::update(double dt) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+        livesInt = 3;  // Reset lives
+        gameScene = std::make_shared<GameScene>();
+        gameScene->load();
+        activeScene = menuScene;
+    }
+    Scene::update(dt);
+}
+
+void GameOverScene::render() {
+    Renderer::queue(&gameOverText);
+    Renderer::queue(&promptText);
     Scene::render();
 }

@@ -23,14 +23,23 @@ public:
 };
 
 class MenuComponent : public Component {
+public:  // Move enums to public section
+    enum class MenuState { TITLE, MAIN_MENU, PAUSE_MENU };
+    enum class MenuType { MAIN, PAUSE };
+
 protected:
-    enum class MenuState { TITLE, MAIN_MENU };
     MenuState _state;
+    MenuType _type;
     size_t _selectedOption;
     std::vector<std::shared_ptr<Entity>> _menuItems;
+    std::shared_ptr<Scene> _activeScene;
+    std::shared_ptr<Scene> _gameScene;
 
 public:
-    explicit MenuComponent(Entity *p);
+    explicit MenuComponent(Entity* p,
+                          std::shared_ptr<Scene>& activeScene,
+                          std::shared_ptr<Scene>& gameScene,
+                          MenuType type = MenuType::MAIN);
 
     void update(double dt) override;
     void render() override {}

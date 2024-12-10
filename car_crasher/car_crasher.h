@@ -14,9 +14,13 @@ class MenuScene final : public Scene {
 private:
     sf::Font font;
     sf::Text text;
+    sf::Text promptText;
+    sf::Clock blinkClock;
+    bool showPrompt;
 
 public:
-    MenuScene() = default;
+    MenuScene() : showPrompt(true) {}
+    // MenuScene() = default;
     void update(double dt) override;
     void render() override;
     void load()override;
@@ -40,4 +44,27 @@ public:
     void update(double dt) override;
     void render() override;
     void load() override;
+    void pauseSounds();
+};
+
+class PauseScene : public Scene {
+protected:
+    sf::Font font;
+    std::vector<std::shared_ptr<Entity>> _menuItems;
+
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+};
+
+class GameOverScene : public Scene {
+private:
+    sf::Font font;
+    sf::Text gameOverText;
+    sf::Text promptText;
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
 };
