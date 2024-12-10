@@ -33,6 +33,7 @@
 using namespace sf;
 using namespace std;
 
+int score;
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -118,6 +119,9 @@ void GameScene::load() {
     // add background
     _backgroundManager.loadBackground(_entity_manager);
 
+    // Initialise score
+    score = 0;
+
     // Initialize obstacle manager
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
     _obstacleManager->initializeSprites(); // Single function call to add all sprites
@@ -165,11 +169,12 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_cop);
 
-
+    
     // UI for lives etc
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
+    /*
     livesText.setFont(font); // Set the font of the text
     livesText.setCharacterSize(24); // Set the character size
     livesText.setFillColor(sf::Color::White); // Set the text color
@@ -181,6 +186,13 @@ void GameScene::load() {
     // rendering and prevent blurriness
     livesText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
     livesText.setPosition(gameWidth - 270.f, 40.f);
+    */
+    // Loads the lives text
+    _gameUIManager.loadLivesText(font, livesText);
+
+    // Loads the score text
+    _gameUIManager.loadScoreText(font, scoreText);
+
     _gameUIManager.loadLives(_entity_manager, livesInt);
 }
 
@@ -196,7 +208,7 @@ void GameScene::update(const double dt) {
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
-
+    
     // Update collision manager
     CollisionManager::checkPlayerCollisions(_entity_manager, _player, _cop);
 
@@ -204,21 +216,27 @@ void GameScene::update(const double dt) {
     if (_obstacleManager) {
         _obstacleManager->update(dt);
     }
-    
-    _gameUIManager.update(dt, _entity_manager, livesInt);
+  
+
+    _gameUIManager.update(dt, _entity_manager);
 
     if (livesInt <= 0 && activeScene != gameOverScene) {
         pauseSounds();
         activeScene = gameOverScene;
     }
+    // Loads the lives text
+    _gameUIManager.loadLivesText(font, livesText);
 
+    // Loads the score text
+    _gameUIManager.loadScoreText(font, scoreText);
     Scene::update(dt);
 }
 
 // Add all entities to the renderer queue
 void GameScene::render() {
-    Renderer::queue(&livesText);
     Scene::render();
+    Renderer::queue(&livesText);
+    Renderer::queue(&scoreText);
 }
 
 
@@ -293,21 +311,7 @@ void GameOverScene::load() {
         throw std::runtime_error("Failed to load font!");
     }
 
-    gameOverText.setFont(font);
-    gameOverText.setString("Game Over");
-    gameOverText.setCharacterSize(48);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setPosition(gameWidth / 2.f, gameHeight / 3.f);
-    gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2.f,
-                          gameOverText.getLocalBounds().height / 2.f);
-
-    promptText.setFont(font);
-    promptText.setString("Press Enter to go to the Main Menu");
-    promptText.setCharacterSize(24);
-    promptText.setFillColor(sf::Color::White);
-    promptText.setPosition(gameWidth / 2.f, gameHeight / 2.f);
-    promptText.setOrigin(promptText.getLocalBounds().width / 2.f,
-                        promptText.getLocalBounds().height / 2.f);
+    _gameUIManager.loadGameOverText(font, gameOverText, gameOverScoreText, promptText);
 }
 
 void GameOverScene::update(double dt) {
@@ -322,6 +326,7 @@ void GameOverScene::update(double dt) {
 
 void GameOverScene::render() {
     Renderer::queue(&gameOverText);
+    Renderer::queue(&gameOverScoreText);
     Renderer::queue(&promptText);
     Scene::render();
 }
