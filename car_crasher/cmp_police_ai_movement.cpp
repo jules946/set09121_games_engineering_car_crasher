@@ -155,7 +155,6 @@ void PolicePursuitComponent::update(double dt) {
         if (sprite) sprite->getSprite().setRotation(0.0f);
     }
 
-    // Rest of the code remains the same...
     const float idealDistance = _pursuitDistance;
     const float currentDistance = pos.y - playerPos.y;
 
