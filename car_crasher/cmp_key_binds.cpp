@@ -3,6 +3,8 @@
 #include "game_config.h"
 #include "system_renderer.h"
 #include "scene.h"
+#include <map>
+#include <SFML/Window/Keyboard.hpp>
 
 sf::Keyboard::Key KeyBindComponent::_leftKey = sf::Keyboard::Left;
 sf::Keyboard::Key KeyBindComponent::_rightKey = sf::Keyboard::Right;
