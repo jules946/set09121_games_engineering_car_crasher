@@ -14,6 +14,7 @@
 #include "obstacle_manager.h"
 #include "game_UI_Manager.h"
 #include "cmp_menu.h"
+#include "cmp_police_ai_movement.h"
 
 using namespace sf;
 using namespace std;
@@ -66,18 +67,6 @@ void MenuScene::load() {
 }
 
 
-/*
-    // Get text bounds
-    const FloatRect bounds = text.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    text.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    text.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 2.f));
-
-    */
-
-
 void MenuScene::update(const double dt) {
     Scene::update(dt);  // Keep this to update all entities/components
 }
@@ -95,17 +84,6 @@ void GameScene::load() {
     // Initialize obstacle manager
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
     _obstacleManager->initializeSprites(); // Single function call to add all sprites
-
-
-    /*
-    // Add obstacle sprites
-    // TODO: Just have 1 function that adds all sprites at initialization? DONE
-    _obstacleManager->addObstacleSprite("res/img/Construction_sign.png");
-    _obstacleManager->addObstacleSprite("res/img/Street_baracade.png");
-    _obstacleManager->addObstacleSprite("res/img/Street_baracade_2.png");
-    _obstacleManager->addObstacleSprite("res/img/Traffic_cone.png");
-
-    */
 
     // Create player
     _player = make_shared<Entity>();
@@ -127,6 +105,30 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_player);
 
+    // TODO maybe make part of the gameScene class?
+    // Create cop car
+    _cop = make_shared<Entity>();
+
+    const auto copSprite = _cop->addComponent<SpriteComponent>();
+    copSprite->setTexture("res/img/police_car.png");
+    copSprite->getSprite().setScale(2.0f, 2.0f);
+    copSprite->getSprite().setOrigin(copSprite->getSprite().getLocalBounds().width / 2.f,
+                             copSprite->getSprite().getLocalBounds().height / 2.f);
+
+    _cop->setPosition(Vector2f(lanePositions[2], gameHeight + 100.f)); // Start below screen
+
+    // Add hitbox component
+    _cop->addComponent<HitboxComponent>(FloatRect(0, 0,
+        copSprite->getSprite().getLocalBounds().width,
+        copSprite->getSprite().getLocalBounds().height));
+
+    // Add pursuit component with required parameters
+    _cop->addComponent<PolicePursuitComponent>(lanePositions, _player, &_entity_manager);
+    _cop->addComponent<SoundEffectComponent>("res/sound/police_siren.wav");
+
+    _entity_manager.list.push_back(_cop);
+
+
     // UI for lives etc
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
@@ -146,14 +148,20 @@ void GameScene::load() {
 }
 
 void GameScene::update(const double dt) {
-
-    std::cout << "Game scene update" << std::endl;
+    if (_firstUpdate) {
+        const auto siren = _cop->getComponent<SoundEffectComponent>();
+        if (siren) {
+            siren->playSound();
+        }
+        _firstUpdate = false;
+    }
+    // std::cout << "Game scene update" << std::endl;
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         activeScene = menuScene;
     }
 
     // Update collision manager
-    CollisionManager::checkPlayerCollisions(_entity_manager, _player);
+    CollisionManager::checkPlayerCollisions(_entity_manager, _player, _cop);
 
     // Update obstacle manager
     if (_obstacleManager) {
