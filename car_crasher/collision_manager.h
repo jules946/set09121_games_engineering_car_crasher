@@ -8,7 +8,7 @@
 
 class CollisionManager {
 public:
-    static void checkPlayerCollisions(EntityManager& entityManager, const std::shared_ptr<Entity>& player);
+    static void checkPlayerCollisions(EntityManager &entityManager, const std::shared_ptr<Entity> &player, const std::shared_ptr<Entity> &cop);
 
 private:
     static void handlePlayerCollision(const std::shared_ptr<Entity>& player, const std::shared_ptr<Entity>& obstacle);
