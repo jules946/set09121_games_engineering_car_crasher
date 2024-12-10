@@ -58,3 +58,14 @@ public:
     void update(double dt) override;
     void render() override;
 };
+
+class GameOverScene : public Scene {
+private:
+    sf::Font font;
+    sf::Text gameOverText;
+    sf::Text promptText;
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+};

@@ -202,6 +202,11 @@ void GameScene::update(const double dt) {
     
     _gameUIManager.update(dt, _entity_manager, livesInt);
 
+    if (livesInt <= 0 && activeScene != gameOverScene) {
+        pauseSounds();
+        activeScene = gameOverScene;
+    }
+
     Scene::update(dt);
 }
 
@@ -274,5 +279,44 @@ void PauseScene::update(double dt) {
 }
 
 void PauseScene::render() {
+    Scene::render();
+}
+
+
+void GameOverScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    gameOverText.setFont(font);
+    gameOverText.setString("Game Over");
+    gameOverText.setCharacterSize(48);
+    gameOverText.setFillColor(sf::Color::Red);
+    gameOverText.setPosition(gameWidth / 2.f, gameHeight / 3.f);
+    gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2.f,
+                          gameOverText.getLocalBounds().height / 2.f);
+
+    promptText.setFont(font);
+    promptText.setString("Press Enter to go to the Main Menu");
+    promptText.setCharacterSize(24);
+    promptText.setFillColor(sf::Color::White);
+    promptText.setPosition(gameWidth / 2.f, gameHeight / 2.f);
+    promptText.setOrigin(promptText.getLocalBounds().width / 2.f,
+                        promptText.getLocalBounds().height / 2.f);
+}
+
+void GameOverScene::update(double dt) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+        livesInt = 3;  // Reset lives
+        gameScene = std::make_shared<GameScene>();
+        gameScene->load();
+        activeScene = menuScene;
+    }
+    Scene::update(dt);
+}
+
+void GameOverScene::render() {
+    Renderer::queue(&gameOverText);
+    Renderer::queue(&promptText);
     Scene::render();
 }

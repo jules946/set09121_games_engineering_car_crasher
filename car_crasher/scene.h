@@ -21,3 +21,4 @@ extern std::shared_ptr<Scene> activeScene;
 extern std::shared_ptr<Scene> menuScene;
 extern std::shared_ptr<Scene> gameScene;
 extern std::shared_ptr<Scene> pauseScene;
+extern std::shared_ptr<Scene> gameOverScene;
