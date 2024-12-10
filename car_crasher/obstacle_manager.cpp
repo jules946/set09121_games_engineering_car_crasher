@@ -98,18 +98,11 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     } else {
         sprite->getSprite().setScale(2.0f, 2.0f);
         const auto scaledBounds = sprite->getSprite().getGlobalBounds();
-        obstacle->addComponent<HitboxComponent>(sf::FloatRect(
-            scaledBounds.left,
-            scaledBounds.top,
-            scaledBounds.width * 2.0f,  // Match sprite scale
-            scaledBounds.height * 2.0f
-        ));
+        //TODO: Figure out why the hitbox is not matching the sprite perfectly
+        obstacle->addComponent<HitboxComponent>(sf::FloatRect(0, 0,
+        sprite->getSprite().getLocalBounds().width,
+        sprite->getSprite().getLocalBounds().height));
     }
     return obstacle;
 
-    // Add hitbox component
-
-    const auto& bounds = sprite->getSprite().getLocalBounds();
-    obstacle->addComponent<HitboxComponent>(sf::FloatRect(0, 0, bounds.width, bounds.height));
-    return obstacle;
 }
