@@ -9,9 +9,10 @@
 class ObstacleManager {
 private:
     float _spawnInterval;
-    sf::Clock _spawnClock;  // Added this
+    sf::Clock _spawnClock;
     std::vector<std::string> _obstacleSprites;
     EntityManager& _entityManager;
+    bool _isGoodObstacle;
 
 public:
     explicit ObstacleManager(EntityManager& entityManager);
@@ -20,6 +21,7 @@ public:
     void setSpawnInterval(float interval) { _spawnInterval = interval; }
     void update(double dt);
     void initializeSprites();
+    //void addHeartSprite(const std::string& spritePath);
 
 private:
     std::shared_ptr<Entity> createObstacle();

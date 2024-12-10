@@ -22,11 +22,11 @@
 //- if car drives over heart ++lives
 
 //Main Menu -- Alessio
-//- Add text to let player know to click a button to start game
+//- Add text to let player know to click a button to start game - Done
 //- Add car change functionality
 //- Add keybind functionality
 //- Add difficulity functionality
-//- Add pause menu to gameScene
+//- Add pause menu to gameScene - Done
 
 
 using namespace sf;
@@ -81,7 +81,7 @@ void MenuScene::load() {
 
     // Setup prompt text
     promptText.setFont(font);
-    promptText.setString("Press Enter to continue or Select an Item in the Menu. Up and Down to navigate the Menu");
+    promptText.setString("Press Enter to continue or to select an item in the Menu. Up and Down to navigate the Menu");
     promptText.setCharacterSize(24);
     promptText.setFillColor(sf::Color::White);
 
@@ -186,7 +186,7 @@ void GameScene::load() {
 
 void GameScene::update(const double dt) {
 
-    std::cout << "Game scene update" << std::endl;
+    // std::cout << "Game scene update" << std::endl; // add back if game not starting
     if (Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
         pauseSounds();
         activeScene = pauseScene;

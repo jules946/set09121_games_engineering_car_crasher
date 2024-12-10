@@ -20,6 +20,7 @@ sf::Sprite &SpriteComponent::getSprite() const {
 
 void SpriteComponent::setTexture(const std::string &textureFile) {
     _texture = std::make_shared<sf::Texture>();
+    _texturePath = textureFile;
     if (!_texture->loadFromFile(textureFile)) {
         throw std::runtime_error("Failed to load texture!");
     }

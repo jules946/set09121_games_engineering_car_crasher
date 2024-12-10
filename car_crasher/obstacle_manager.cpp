@@ -16,17 +16,27 @@ void ObstacleManager::addObstacleSprite(const std::string& spritePath) {
 }
 
 void ObstacleManager::initializeSprites() {
-    _obstacleSprites = {
-        "res/img/Construction_sign.png",
-        "res/img/Street_baracade.png",
-        "res/img/Street_baracade_2.png",
-        "res/img/Traffic_cone.png"
-    };
+    // Bad obstacles
+    addObstacleSprite("res/img/Construction_sign.png");
+    addObstacleSprite("res/img/Street_baracade.png");
+    addObstacleSprite("res/img/Street_baracade_2.png");
+    addObstacleSprite("res/img/Traffic_cone.png");
+    addObstacleSprite("res/img/Taxi.png");
+    addObstacleSprite("res/img/Truck.png");
+    addObstacleSprite("res/img/School_bus.png");
+    addObstacleSprite("res/img/Van_rundown.png");
+    // Good obstacles
+    addObstacleSprite("res/img/heartLife.png");  // Add heart to sprites
 }
 
 const std::string& ObstacleManager::getRandomSprite() const {
+    static const std::string heartSprite = "res/img/heartLife.png";
+    if (rand() % 10 == 0) {  // 10% chance for heart
+        return heartSprite;
+    }
     return _obstacleSprites[rand() % _obstacleSprites.size()];
 }
+
 
 void ObstacleManager::update(double dt) {
 
@@ -48,11 +58,21 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     if (_obstacleSprites.empty()) return nullptr;
 
     auto obstacle = std::make_shared<Entity>();
-
-    // Add sprite component
     auto sprite = obstacle->addComponent<SpriteComponent>();
-    sprite->setTexture(getRandomSprite());
-    sprite->getSprite().setScale(2.0f, 2.0f);
+    std::string spritePath = getRandomSprite();
+    sprite->setTexture(spritePath);
+
+
+    // Set scale based on sprite type
+    // Different scale for heart
+    if (spritePath == "res/img/heartLife.png") {
+        _isGoodObstacle = true;
+        sprite->getSprite().setScale(0.1f, 0.1f);
+    } else {
+        _isGoodObstacle = false;
+        sprite->getSprite().setScale(2.0f, 2.0f);
+    }
+
     sprite->getSprite().setOrigin(
         sprite->getSprite().getLocalBounds().width / 2.f,
         sprite->getSprite().getLocalBounds().height / 2.f
@@ -66,7 +86,29 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     obstacle->setPosition(sf::Vector2f(lanePositions[lane], -50.f));
 
 
+    if (spritePath == "res/img/heartLife.png") {
+        sprite->getSprite().setScale(0.1f, 0.1f);
+        const auto scaledBounds = sprite->getSprite().getGlobalBounds();
+        obstacle->addComponent<HitboxComponent>(sf::FloatRect(
+            scaledBounds.left,
+            scaledBounds.top,
+            scaledBounds.width * 0.1f,  // Match sprite scale
+            scaledBounds.height * 0.1f
+        ));
+    } else {
+        sprite->getSprite().setScale(2.0f, 2.0f);
+        const auto scaledBounds = sprite->getSprite().getGlobalBounds();
+        obstacle->addComponent<HitboxComponent>(sf::FloatRect(
+            scaledBounds.left,
+            scaledBounds.top,
+            scaledBounds.width * 2.0f,  // Match sprite scale
+            scaledBounds.height * 2.0f
+        ));
+    }
+    return obstacle;
+
     // Add hitbox component
+
     const auto& bounds = sprite->getSprite().getLocalBounds();
     obstacle->addComponent<HitboxComponent>(sf::FloatRect(0, 0, bounds.width, bounds.height));
     return obstacle;
