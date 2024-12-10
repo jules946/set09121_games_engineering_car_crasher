@@ -55,6 +55,7 @@ void MenuScene::load() {
     title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
     titleText->centerOrigin();
 
+
     // Create menu items
     std::vector<std::string> options = {
         "Play Game",
@@ -77,7 +78,22 @@ void MenuScene::load() {
         _entity_manager.list.push_back(item);
         yPos += 60.f;
     }
+
+    // Setup prompt text
+    promptText.setFont(font);
+    promptText.setString("Press Enter to continue or Select an Item in the Menu. Up and Down to navigate the Menu");
+    promptText.setCharacterSize(24);
+    promptText.setFillColor(sf::Color::White);
+
+    // Center the prompt text
+    const FloatRect promptBounds = promptText.getLocalBounds();
+    promptText.setOrigin(std::round(promptBounds.width / 2.f),
+                        std::round(promptBounds.height / 2.f));
+    promptText.setPosition(std::round(gameWidth / 2.f),
+                          std::round(gameHeight - 100.f));
 }
+
+
 
 
 /*
@@ -93,12 +109,21 @@ void MenuScene::load() {
 
 
 void MenuScene::update(const double dt) {
-    Scene::update(dt);  // Keep this to update all entities/components
+    // Blink the prompt text every 0.8 seconds
+    if (blinkClock.getElapsedTime().asSeconds() > 0.8f) {
+        showPrompt = !showPrompt;
+        blinkClock.restart();
+    }
+
+    Scene::update(dt);
 }
 
+
 void MenuScene::render() {
-    Renderer::queue(&text);
     Scene::render();
+    if (showPrompt) {
+        Renderer::queue(&promptText);
+    }
 }
 
 // GameScene class implementation

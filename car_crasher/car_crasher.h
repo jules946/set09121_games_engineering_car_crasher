@@ -18,9 +18,13 @@ class MenuScene final : public Scene {
 private:
     sf::Font font;
     sf::Text text;
+    sf::Text promptText;
+    sf::Clock blinkClock;
+    bool showPrompt;
 
 public:
-    MenuScene() = default;
+    MenuScene() : showPrompt(true) {}
+    // MenuScene() = default;
     void update(double dt) override;
     void render() override;
     void load()override;

@@ -74,12 +74,12 @@ void MenuComponent::update(double dt) {
     if (_type == MenuType::MAIN) {
         // Main Menu Logic
         if (_state == MenuState::TITLE) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spacePressed) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
                 _state = MenuState::MAIN_MENU;
-                spacePressed = true;
+                returnPressed = true;
             }
-            else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                spacePressed = false;
+            else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+                returnPressed = false;
             }
         }
     }
