@@ -8,6 +8,7 @@ SoundEffectComponent::SoundEffectComponent(Entity* p, const std::string& soundFi
     }
     _sound.setBuffer(_soundBuffer);
     _sound.setLoop(true);
+    _sound.setVolume(30.0f);
 }
 
 void SoundEffectComponent::playSound() {
@@ -20,6 +21,10 @@ void SoundEffectComponent::stopSound() {
     if (_sound.getStatus() == sf::Sound::Playing) {
         _sound.stop();
     }
+}
+
+void SoundEffectComponent::setVolume(const float volume) {
+    _sound.setVolume(volume);
 }
 
 void SoundEffectComponent::update(double dt) {

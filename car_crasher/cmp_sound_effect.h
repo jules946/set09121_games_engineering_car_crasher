@@ -13,7 +13,7 @@ public:
     explicit SoundEffectComponent(Entity* p, const std::string& soundFile);
     void playSound();
     void stopSound();
-
+    void setVolume(float volume);
     void update(double dt) override;
 
     void render() override;
