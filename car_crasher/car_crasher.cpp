@@ -11,6 +11,7 @@
 #include "system_renderer.h"
 #include "background_manager.h"
 #include "cmp_hit_box.h"
+#include "cmp_key_binds.h"
 #include "obstacle_manager.h"
 #include "game_UI_Manager.h"
 #include "cmp_menu.h"
@@ -19,8 +20,8 @@
 
 // TODO
 // Obstacle Manager -- Alessio
-//- add good obstacles e.g. heart
-//- if car drives over heart ++lives
+//- add good obstacles e.g. heart - done
+//- if car drives over heart ++lives - done
 
 //Main Menu -- Alessio
 //- Add text to let player know to click a button to start game - Done
@@ -34,6 +35,9 @@ using namespace sf;
 using namespace std;
 
 int score;
+
+std::unique_ptr<KeyBindComponent> keyBindComponent;
+static bool enterKeyReleased = false; // make sure Enter key is not registered before accessing KeyBindScene
 
 // MenuScene class implementation
 void MenuScene::load() {
@@ -94,6 +98,7 @@ void MenuScene::load() {
     promptText.setPosition(std::round(gameWidth / 2.f),
                           std::round(gameHeight - 100.f));
 }
+
 
 
 void MenuScene::update(const double dt) {
@@ -334,6 +339,37 @@ void GameOverScene::render() {
 }
 
 void KeyBindScene::load() {
+    // Create the KeyBindComponent instance
+    auto entity = makeEntity();
+    keyBindComponent = std::make_unique<KeyBindComponent>(entity.get());
+
+    // Load fonts and setup is already handled in KeyBindComponent, so no need to duplicate here
+    keyBindComponent->update(0); // Ensure initial state is set
+}
+
+void KeyBindScene::update(double dt) {
+    // Update the KeyBindComponent
+    keyBindComponent->update(dt);
+
+    // Handle scene navigation (return to menu)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) {
+        activeScene = menuScene;
+    }
+
+    Scene::update(dt);
+}
+
+void KeyBindScene::render() {
+    // Render the KeyBindComponent
+    keyBindComponent->render();
+
+    Scene::render();
+}
+
+
+/* old key binds code
+/ can be an alternative
+void KeyBindScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
@@ -383,3 +419,4 @@ void KeyBindScene::render() {
     Renderer::queue(&promptText);
     Scene::render();
 }
+*/

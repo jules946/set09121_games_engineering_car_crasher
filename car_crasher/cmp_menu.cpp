@@ -7,6 +7,7 @@
 #include "scene.h"
 #include "game_UI_Manager.h"
 
+
 // TextComponent implementation
 TextComponent::TextComponent(Entity* p, const std::string& str)
     : Component(p), _selected(false) {
@@ -114,26 +115,25 @@ void MenuComponent::update(double dt) {
             if (_type == MenuType::MAIN) {
                 if (_selectedOption == 0) {
                     activeScene = gameScene;  // Start game
+                } else if (_selectedOption == 3) {  // Key Binds option
+                    activeScene = keyBindScene;
+                    sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
                 }
-                else if (_selectedOption == 3) {  // Key Binds option
-                    activeScene = keyBindScene;                }
-            }
-            else if (_type == MenuType::PAUSE) {
+            } else if (_type == MenuType::PAUSE) {
                 if (_selectedOption == 0) {  // "Yes, please"
                     gameScene = std::make_shared<GameScene>();
                     livesInt = 3;  // Reset lives
                     gameScene->load();
                     activeScene = menuScene;
-                }
-                else if (_selectedOption == 1) {  // "No, go back to the game"
+                } else if (_selectedOption == 1) {  // "No, go back to the game"
                     activeScene = gameScene;
                 }
             }
-            returnPressed = true;
+            returnPressed = true;  // Set returnPressed only after scene transition logic
+        } else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+            returnPressed = false;  // Reset when Return key is released
         }
-        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-            returnPressed = false;
-        }
+
     }
 
     // Update visibility

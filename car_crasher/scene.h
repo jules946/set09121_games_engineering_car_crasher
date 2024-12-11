@@ -11,6 +11,8 @@ public:
     virtual void render();
     virtual void load() = 0;
     std::vector<std::shared_ptr<Entity>> &getEnts();
+    // Create and add an entity to the scene
+    std::shared_ptr<Entity> makeEntity();
 
 protected:
     EntityManager _entity_manager;

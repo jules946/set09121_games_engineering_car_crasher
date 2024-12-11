@@ -2,6 +2,7 @@
 #pragma once
 #include "ecm.h"
 #include <SFML/Graphics.hpp>
+extern std::map<sf::Keyboard::Key, std::string> keyToStringMap;
 
 class KeyBindComponent : public Component {
 protected:
@@ -21,4 +22,5 @@ public:
     void render() override;
     static sf::Keyboard::Key getLeftKey() { return _leftKey; }
     static sf::Keyboard::Key getRightKey() { return _rightKey; }
+    static std::string keyToString(sf::Keyboard::Key key);
 };
