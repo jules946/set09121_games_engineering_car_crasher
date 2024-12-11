@@ -43,11 +43,12 @@ std::unique_ptr<KeyBindComponent> keyBindComponent;
 std::string selectedCar = "Blue Car";
 
 const std::map<std::string, std::string> CAR_CONFIGS = {
-    {"Blue Car", "res/img/BlueCar.png"},
-    {"Grey Car", "res/img/Car_Grey.png"},
-    {"Red Car", "res/img/Car_Red.png"},
-    {"Striped Car", "res/img/Car_Striped.png"}
+    std::make_pair("Blue Car", "res/img/BlueCar.png"),
+    std::make_pair("Grey Car", "res/img/Car_Grey.png"),
+    std::make_pair("Red Car", "res/img/Car_Red.png"),
+    std::make_pair("Striped Car", "res/img/Car_Striped.png")
 };
+
 // MenuScene class implementation
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
@@ -362,7 +363,10 @@ void ChangeCarScene::load() {
     float yPos = gameHeight / 2.f;
 
     // Create menu items from CAR_CONFIGS
-    for (const auto& [carName, spritePath] : CAR_CONFIGS) {
+    for (const auto& carConfig : CAR_CONFIGS) {
+        const std::string& carName = carConfig.first;
+        const std::string& spritePath = carConfig.second;
+
         sf::Text text;
         text.setFont(font);
         text.setString(carName);
@@ -376,7 +380,8 @@ void ChangeCarScene::load() {
     // Set initial selected option based on current selectedCar
     selectedOption = 0;
     int index = 0;
-    for (const auto& [carName, _] : CAR_CONFIGS) {
+    for (const auto& carConfig : CAR_CONFIGS) {
+        const std::string& carName = carConfig.first;
         if (carName == selectedCar) {
             selectedOption = index;
             break;
