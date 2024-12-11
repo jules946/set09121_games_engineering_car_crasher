@@ -62,11 +62,19 @@ target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS} "${CMAKE_CURRENT_SOU
 target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)
 
 # Copy the OpenAL32.dll file to the output directory to get audio working
-if (WIN32)
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    # For Visual Studio: copy to Debug/Release-specific directories
     add_custom_command(TARGET CAR_CRASHER POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/openal32.dll"
             "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/"
+    )
+else()
+    # For CLion (or other non-Visual Studio generators): copy to runtime directory
+    add_custom_command(TARGET CAR_CRASHER POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/openal32.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
     )
 endif()
 

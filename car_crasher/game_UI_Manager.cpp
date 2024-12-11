@@ -57,7 +57,7 @@ void gameUIManager::setupTexts(Text& scoreText, Text& livesText, Text& pauseText
     const FloatRect pauseBounds = pauseText.getLocalBounds();
     pauseText.setOrigin(std::round(pauseBounds.width / 2.f),
                        std::round(pauseBounds.height / 2.f));
-    pauseText.setPosition(80.f, 40.f);
+    pauseText.setPosition(std::round(150.f), std::round(40.f));
 
     // Initial score update
     updateScoreText(scoreText);
