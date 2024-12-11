@@ -26,7 +26,7 @@
 //Main Menu -- Alessio
 //- Add text to let player know to click a button to start game - Done
 //- Add car change functionality
-//- Add keybind functionality
+//- Add keybind functionality - 90% done, working, only to perfection it
 //- Add difficulity functionality
 //- Add pause menu to gameScene - Done
 
@@ -149,7 +149,7 @@ void GameScene::load() {
 
     std::cout << "Loading car: " << static_cast<int>(selectedCar) << std::endl;
     //std::cout << "Loading car: " << static_cast<int>(ChangeCarScene::getSelectedCar()) << std::endl;
-    const auto s = _player->addComponent<SpriteComponent>();
+    const auto s = _player->addComponent<SpriteComponent>(); // using const
     //s->setTexture(ChangeCarScene::getCarTexturePath(ChangeCarScene::getSelectedCar()));
     s->setTexture(ChangeCarScene::getCarTexturePath(selectedCar));
 

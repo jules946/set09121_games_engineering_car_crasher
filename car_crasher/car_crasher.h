@@ -104,6 +104,6 @@ public:
     void update(double dt) override;
     void render() override;
     // static CarType getSelectedCar() { return selectedCar; }
-    CarType getSelectedCar() { return selectedCar; }
+    //CarType getSelectedCar() { return selectedCar; }
     static std::string getCarTexturePath(CarType car);
 };
