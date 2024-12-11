@@ -51,7 +51,6 @@ void TextComponent::centerOrigin() {
 }
 
 
-
 // MenuComponent implementation
 MenuComponent::MenuComponent(Entity* p, const MenuType type)
     : Component(p),
@@ -108,9 +107,6 @@ void MenuComponent::update(double dt) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
             if (_type == MenuType::MAIN) {
                 if (_selectedOption == 0) {  // Play Game
-                    // gameScene = std::make_shared<GameScene>();  // Always create new scene
-                    // gameScene->load();  // This will use the currently selected car
-                    // gameScene->Reset();
                     activeScene = gameScene;
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;

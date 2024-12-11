@@ -12,16 +12,17 @@ using namespace sf;
 class gameUIManager {
 private:
     sf::Texture livesTexture; // Store texture persistently
+    sf::Font _font;
     sf::Text pauseText;
 
 public:
+    void loadFont(const Font& font);
     void loadLives(EntityManager& entityManager, int livesInt);
-    void update(double dt, EntityManager& entityManager);
-    void resetLives() { livesInt = 3; } // Reset hearts when quitting the game
-    void loadLivesText(Font& font, Text& livesText);
-    void loadScoreText(Font& font, Text& scoreText);
-    void loadGameOverText(Font& font, Text& gameOverText, Text& gameOverScoreText, Text& promptText);
-    void loadPauseText(Font& font, Text& pauseText);
+    void setupTexts(Text &scoreText, Text &livesText, Text &pauseText) const;
+    static void updateScoreText(Text &scoreText);
+    void update(double dt, EntityManager &entityManager, Text &scoreText) const;
+    void setupGameOverTexts(Text &gameOverText, Text &gameOverScoreText, Text &promptText) const;
+    static void updateGameOverScore(Text &gameOverScoreText);
 };
 
 

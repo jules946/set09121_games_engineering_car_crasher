@@ -10,14 +10,9 @@ using namespace sf;
 int livesInt = 3;
 
 void gameUIManager::loadLives(EntityManager& entityManager, int livesInt) {
-  // TODO add heart image
     if (!livesTexture.loadFromFile("res/img/heartLife.png")) {
         throw std::runtime_error("Failed to load road texture!");
     }
-
-    //const sf::Vector2f textureSize(livesTexture.getSize().x, livesTexture.getSize().y);
-    //const float scaleX = columnWidth / textureSize.x;
-    //const float scaledWidth = textureSize.x * scaleX;
 
     for (int i = 0; i < livesInt; i++) {
         auto heart = std::make_shared<Entity>();
@@ -31,20 +26,64 @@ void gameUIManager::loadLives(EntityManager& entityManager, int livesInt) {
         s->getSprite().setTexture(livesTexture);
         s->getSprite().setScale(0.1f, 0.1f);
         s->getSprite().setOrigin(0, 0);
-        //s->getSprite().setPosition(sf::Vector2f(xPos, yPos));
         
         entityManager.list.push_back(heart);
     }
 }
 
+// Initial setup of all text properties
+void gameUIManager::setupTexts(Text& scoreText, Text& livesText, Text& pauseText) const {
+    // Score text setup
+    scoreText.setFont(_font);
+    scoreText.setCharacterSize(24);
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setPosition(gameWidth - 240.f, 100.f);
 
-void gameUIManager::update(double dt, EntityManager& entityManager) {
+    // Lives text setup
+    livesText.setFont(_font);
+    livesText.setCharacterSize(24);
+    livesText.setFillColor(sf::Color::White);
+    livesText.setPosition(gameWidth - 270.f, 40.f);
+    livesText.setString("Lives:");
+    const FloatRect livesBounds = livesText.getLocalBounds();
+    livesText.setOrigin(std::round(livesBounds.width / 2.f),
+                       std::round(livesBounds.height / 2.f));
+
+    // Pause text setup
+    pauseText.setFont(_font);
+    pauseText.setCharacterSize(24);
+    pauseText.setFillColor(sf::Color::White);
+    pauseText.setString("Press Tab to pause");
+    const FloatRect pauseBounds = pauseText.getLocalBounds();
+    pauseText.setOrigin(std::round(pauseBounds.width / 2.f),
+                       std::round(pauseBounds.height / 2.f));
+    pauseText.setPosition(80.f, 40.f);
+
+    // Initial score update
+    updateScoreText(scoreText);
+}
+
+// Just update the score text content
+void gameUIManager::updateScoreText(Text& scoreText) {
+    scoreText.setString("Score: " + std::to_string(score));
+    const FloatRect bounds = scoreText.getLocalBounds();
+    scoreText.setOrigin(std::round(bounds.width / 2.f),
+                       std::round(bounds.height / 2.f));
+}
+
+void gameUIManager::update(double dt, EntityManager& entityManager, Text& scoreText) const {
     auto& entities = entityManager.list;
     std::vector<std::shared_ptr<Entity>> uiHearts;
 
-    // Increment score
-    score++;
+    // Add points based on time elapsed
+    static float timeSinceLastScore = 0.0f;
+    timeSinceLastScore += dt;
 
+    if (timeSinceLastScore >= 0.5f) {  // Every second
+        score += 10;
+        timeSinceLastScore = 0.0f;  // Reset the timer
+    }
+    updateScoreText(scoreText);
     // Collect UI hearts
     for (const auto& entity : entities) {
         if (entity->getPosition().y == 20.f) {
@@ -75,82 +114,43 @@ void gameUIManager::update(double dt, EntityManager& entityManager) {
     }
 }
 
-void gameUIManager::loadLivesText(Font& font, Text& livesText) {
-    livesText.setFont(font); // Set the font of the text
-    livesText.setCharacterSize(24); // Set the character size
-    livesText.setFillColor(sf::Color::White); // Set the text color
-    livesText.setString("Lives:");
-    // Get text bounds
-    const FloatRect bounds = livesText.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    livesText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    livesText.setPosition(gameWidth - 270.f, 40.f);
-}
-
-void gameUIManager::loadScoreText(Font& font, Text& scoreText) {
-    int tempScore = score / 60;
-    std::string s = std::to_string(tempScore);
-
-    scoreText.setFont(font); // Set the font of the text
-    scoreText.setCharacterSize(24); // Set the character size
-    scoreText.setFillColor(sf::Color::White); // Set the text color
-    scoreText.setString("Score:" + s);
-    // Get text bounds
-    const FloatRect bounds = scoreText.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    scoreText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    scoreText.setPosition(gameWidth - 240.f, 100.f);
-}
-
-void gameUIManager::loadPauseText(Font& font, Text& pauseText) {
-    pauseText.setFont(font);
-    pauseText.setCharacterSize(24);
-    pauseText.setFillColor(sf::Color::White);
-    pauseText.setString("Press Tab to pause");
-
-    const FloatRect bounds = pauseText.getLocalBounds();
-    pauseText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    pauseText.setPosition(80.f, 40.f);
-}
-
-void gameUIManager::loadGameOverText(Font& font, Text& gameOverText, Text& gameOverScoreText, Text& promptText) {
-    gameOverText.setFont(font);
+void gameUIManager::setupGameOverTexts(Text& gameOverText, Text& gameOverScoreText, Text& promptText) const {
+    // Game Over text setup
+    gameOverText.setFont(_font);
     gameOverText.setCharacterSize(96);
     gameOverText.setFillColor(sf::Color::Red);
     gameOverText.setString("Game Over");
-    // Get text bounds
     const FloatRect bounds = gameOverText.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
     gameOverText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
     gameOverText.setPosition(gameWidth / 2.f, gameHeight / 2.f - 100);
 
-    int tempScore = score / 60;
-    std::string s = std::to_string(tempScore);
+    // Score text setup
+    gameOverScoreText.setFont(_font);
+    gameOverScoreText.setCharacterSize(72);
+    gameOverScoreText.setFillColor(sf::Color::Red);
 
-    gameOverScoreText.setFont(font); // Set the font of the text
-    gameOverScoreText.setCharacterSize(72); // Set the character size
-    gameOverScoreText.setFillColor(sf::Color::Red); // Set the text color
-    gameOverScoreText.setString("Score:" + s);
-    // Get text bounds
-    const FloatRect bounds2 = gameOverScoreText.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    gameOverScoreText.setOrigin(std::round(bounds2.width / 2.f), std::round(bounds2.height / 2.f));
-    gameOverScoreText.setPosition(gameWidth / 2.f, gameHeight / 2.f + 100);
-
-    promptText.setFont(font);
+    // Prompt text setup
+    promptText.setFont(_font);
     promptText.setString("Press Enter to go to the Main Menu");
     promptText.setCharacterSize(24);
     promptText.setFillColor(sf::Color::White);
     promptText.setPosition(gameWidth / 2.f, gameHeight / 2.f);
     promptText.setOrigin(promptText.getLocalBounds().width / 2.f,
         promptText.getLocalBounds().height / 2.f);
+
+    // Initial score update
+    updateGameOverScore(gameOverScoreText);
 }
 
+// Just update the score text
+void gameUIManager::updateGameOverScore(Text& gameOverScoreText) {
+    std::string s = std::to_string(score);
+    gameOverScoreText.setString("Score: " + s);
+    const FloatRect bounds = gameOverScoreText.getLocalBounds();
+    gameOverScoreText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
+    gameOverScoreText.setPosition(gameWidth / 2.f, gameHeight / 2.f + 100);
+}
+
+void gameUIManager::loadFont(const Font& font) {
+    _font = font;
+}

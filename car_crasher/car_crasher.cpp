@@ -134,29 +134,21 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
+    score = 0;
     // add background
     _backgroundManager.loadBackground(_entity_manager);
 
-    // Initialise score
-    score = 0;
-
     // Initialize obstacle manager
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
-    _obstacleManager->initializeSprites(); // Single function call to add all sprites
+    _obstacleManager->initializeSprites();
 
     // Create player
     _player = make_shared<Entity>();
 
     std::cout << "Loading car: " << static_cast<int>(selectedCar) << std::endl;
-    //std::cout << "Loading car: " << static_cast<int>(ChangeCarScene::getSelectedCar()) << std::endl;
     const auto s = _player->addComponent<SpriteComponent>(); // using const
     //s->setTexture(ChangeCarScene::getCarTexturePath(ChangeCarScene::getSelectedCar()));
     s->setTexture(ChangeCarScene::getCarTexturePath(selectedCar));
-
-
-    // Add sprite component to player
-    //s->setTexture("res/img/BlueCar.png");
-
 
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
@@ -172,7 +164,6 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_player);
 
-    // TODO maybe make part of the gameScene class?
     // Create cop car
     _cop = make_shared<Entity>();
 
@@ -195,19 +186,15 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_cop);
 
-    _gameUIManager.loadPauseText(font, pauseText);
+
 
     // UI for lives etc
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
 
-    // Loads the lives text
-    _gameUIManager.loadLivesText(font, livesText);
-
-    // Loads the score text
-    _gameUIManager.loadScoreText(font, scoreText);
-
+    _gameUIManager.loadFont(font);
+    _gameUIManager.setupTexts(scoreText, livesText, pauseText);
     _gameUIManager.loadLives(_entity_manager, livesInt);
 }
 
@@ -234,17 +221,14 @@ void GameScene::update(const double dt) {
     }
   
 
-    _gameUIManager.update(dt, _entity_manager);
+    _gameUIManager.update(dt, _entity_manager, scoreText);
 
     if (livesInt <= 0 && activeScene != gameOverScene) {
         stopSounds();
+        std::cout << "Debug: Score before switching to game over scene: " << score << std::endl;
         activeScene = gameOverScene;
     }
-    // Loads the lives text
-    _gameUIManager.loadLivesText(font, livesText);
 
-    // Loads the score text
-    _gameUIManager.loadScoreText(font, scoreText);
     Scene::update(dt);
 }
 
@@ -322,15 +306,15 @@ void GameOverScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
-
-    _gameUIManager.loadGameOverText(font, gameOverText, gameOverScoreText, promptText);
+    _gameUIManager.loadFont(font);
+    _gameUIManager.setupGameOverTexts(gameOverText, gameOverScoreText, promptText);
 }
 
 void GameOverScene::update(double dt) {
+    _gameUIManager.updateGameOverScore(gameOverScoreText);
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-        livesInt = 3;  // Reset lives
-        gameScene = std::make_shared<GameScene>();
-        gameScene->load();
+        gameScene->reset();
         activeScene = menuScene;
     }
     Scene::update(dt);
@@ -442,57 +426,3 @@ void ChangeCarScene::render() {
         Renderer::queue(&carOptions[i].first);
     }
 }
-
-/* old key binds code
-/ can be an alternative
-void KeyBindScene::load() {
-    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
-        throw std::runtime_error("Failed to load font!");
-    }
-
-    titleText.setFont(font);
-    titleText.setString("Key Binds");
-    titleText.setCharacterSize(48);
-    titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
-    titleText.setOrigin(titleText.getLocalBounds().width / 2.f, titleText.getLocalBounds().height / 2.f);
-
-    leftKeyText.setFont(font);
-    leftKeyText.setString("Left Key: A");
-    leftKeyText.setCharacterSize(32);
-    leftKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f - 50.f);
-    leftKeyText.setOrigin(leftKeyText.getLocalBounds().width / 2.f, leftKeyText.getLocalBounds().height / 2.f);
-
-    rightKeyText.setFont(font);
-    rightKeyText.setString("Right Key: D");
-    rightKeyText.setCharacterSize(32);
-    rightKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f + 50.f);
-    rightKeyText.setOrigin(rightKeyText.getLocalBounds().width / 2.f, rightKeyText.getLocalBounds().height / 2.f);
-
-    promptText.setFont(font);
-    promptText.setString("Press Backspace to return to menu");
-    promptText.setCharacterSize(24);
-    promptText.setPosition(gameWidth / 2.f, gameHeight * 3.f / 4.f);
-    promptText.setOrigin(promptText.getLocalBounds().width / 2.f, promptText.getLocalBounds().height / 2.f);
-
-    // Set colors
-    titleText.setFillColor(sf::Color::White);
-    leftKeyText.setFillColor(sf::Color::White);
-    rightKeyText.setFillColor(sf::Color::White);
-    promptText.setFillColor(sf::Color::White);
-}
-
-void KeyBindScene::update(double dt) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) {  // Changed from Escape to BackSpace
-        activeScene = menuScene;
-    }
-    Scene::update(dt);
-}
-
-void KeyBindScene::render() {
-    Renderer::queue(&titleText);
-    Renderer::queue(&leftKeyText);
-    Renderer::queue(&rightKeyText);
-    Renderer::queue(&promptText);
-    Scene::render();
-}
-*/

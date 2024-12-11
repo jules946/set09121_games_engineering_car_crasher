@@ -18,10 +18,8 @@ void SoundEffectComponent::playSound() {
 }
 
 void SoundEffectComponent::stopSound() {
-    std::cout << "Stopping sound..." << std::endl;
     if (_sound.getStatus() == sf::Sound::Playing) {
         _sound.stop();
-        std::cout << "Sound stopped" << std::endl;
     }
 }
 

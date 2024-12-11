@@ -21,7 +21,6 @@ public:
     void setSpawnInterval(float interval) { _spawnInterval = interval; }
     void update(double dt);
     void initializeSprites();
-    //void addHeartSprite(const std::string& spritePath);
 
 private:
     std::shared_ptr<Entity> createObstacle();
