@@ -23,6 +23,9 @@ constexpr std::array<float, numLanes> lanePositions = {
     startX + columnWidth * 3.5f  // Lane 4
 };
 
+// Base speed for non-car obstacles and background
+constexpr float baseSpeed = 200.0f;
+
 // Other shared constants (e.g., tile size, overlap)
 constexpr float tileScaleY = 2.0f;
 constexpr float overlap = 1.0f;

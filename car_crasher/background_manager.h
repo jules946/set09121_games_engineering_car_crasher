@@ -1,7 +1,6 @@
 #ifndef BACKGROUND_MANAGER_H
 #define BACKGROUND_MANAGER_H
 
-#include <memory>
 #include "entity_manager.h"
 #include "SFML/Graphics/Texture.hpp"
 

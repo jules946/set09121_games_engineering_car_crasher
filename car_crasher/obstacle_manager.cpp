@@ -7,6 +7,7 @@
 #include "cmp_actor_movement.h"
 #include "cmp_hit_box.h"
 
+
 ObstacleManager::ObstacleManager(EntityManager& entityManager)
     : _entityManager(entityManager),
       _spawnInterval(isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL),
@@ -83,6 +84,12 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     std::string spritePath = getRandomSprite();
     sprite->setTexture(spritePath);
 
+    // Determine the type of obstacle
+    bool isCarObstacle = (spritePath == "res/img/Taxi.png" ||
+                          spritePath == "res/img/Truck.png" ||
+                          spritePath == "res/img/School_bus.png" ||
+                          spritePath == "res/img/Van_rundown.png");
+
     // Set scale based on sprite type
     if (spritePath == "res/img/heartLife.png") {
         _isGoodObstacle = true;
@@ -98,7 +105,12 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     );
 
     const int bestLane = findBestLane();
-    auto movement = obstacle->addComponent<ObstacleMovementComponent>(bestLane);
+    float carObstacleSpeedPercentage = 0.5f;
+    float obstacleSpeed = isCarObstacle
+                              ? baseSpeed * carObstacleSpeedPercentage  // Car obstacles are slower
+                              : baseSpeed;                              // Non-car obstacles use baseSpeed
+
+    auto movement = obstacle->addComponent<ObstacleMovementComponent>(bestLane, obstacleSpeed);
     obstacle->setPosition(sf::Vector2f(lanePositions[bestLane], -50.f));
 
     // Add hitbox
@@ -122,13 +134,25 @@ void ObstacleManager::update(double dt) {
 
     if (_spawnClock.getElapsedTime().asSeconds() > _spawnInterval) {
         if (auto obstacle = createObstacle()) {
-            std::cout << "Created new obstacle" << std::endl;
+            // std::cout << "Created new obstacle" << std::endl;
             _entityManager.list.push_back(obstacle);
         } else {
-            std::cout << "Failed to create obstacle" << std::endl;
+            // std::cout << "Failed to create obstacle" << std::endl;
         }
         _spawnClock.restart();
     }
+
+    // Cleanup obstacles that are off-screen
+    _entityManager.list.erase(
+        std::remove_if(
+            _entityManager.list.begin(),
+            _entityManager.list.end(),
+            [](const std::shared_ptr<Entity>& entity) {
+                return entity->is_fordeletion();
+            }
+        ),
+        _entityManager.list.end()
+    );
 }
 
 const std::string& ObstacleManager::getRandomSprite() const {

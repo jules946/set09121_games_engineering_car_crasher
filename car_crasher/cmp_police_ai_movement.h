@@ -14,12 +14,18 @@ private:
     bool _isChangingLane;
     float _targetX;
     float _pursuitDistance = 150.0f;
-    float _detectionRange = 500.0f;
+    float _detectionRange = 200.0f;
     float _horizontalSpeed = 250.0f;
-    float _decisionDelay = 0.3f;
+    float _decisionDelay = 0.2f;
     float _timeSinceLastDecision = 0.0f;
+    float _timeInDisfavoredLane = 0.0f;
+    float _maxDisfavoredLaneTime = 1.5f;
+
 
     bool isObstacleInLane(float laneX, const EntityManager& em) const;
+
+    int getPlayerLane() const;
+
     int findBestPursuitLane(const EntityManager& em) const;
 
     void updatePursuit(double dt);

@@ -47,19 +47,31 @@ float PolicePursuitComponent::calculateLaneScore(int lane, const EntityManager& 
     auto policePos = _parent->getPosition();
     auto playerPos = playerPtr->getPosition();
 
-    // Decrease score if there are obstacles in this lane
-    if (isObstacleInLane(laneX, em)) {
-        score -= 80.0f;
+    // Find player's current lane
+    int playerLane = 0;
+    for (int i = 0; i < _lanePositions.size(); ++i) {
+        if (std::abs(playerPos.x - _lanePositions[i]) < 20.0f) {
+            playerLane = i;
+            break;
+        }
     }
 
-    // Decrease score based on distance from player's lane
-    float distanceFromPlayer = std::abs(laneX - playerPos.x);
-    score -= (distanceFromPlayer * 0.5f);
+    // Check for obstacles first and give it highest priority
+    if (isObstacleInLane(laneX, em)) {
+        score -= 300.0f;  // Increased penalty for obstacles
+    }
 
-    // Decrease score if lane change is too drastic
-    float currentDistanceFromPlayer = std::abs(policePos.x - playerPos.x);
-    if (std::abs(laneX - policePos.x) > currentDistanceFromPlayer) {
-        score -= 20.0f;
+    // Heavily penalize same lane as player but less than obstacles
+    if (lane == playerLane) {
+        score -= 200.0f;
+    }
+    // Favor adjacent lanes
+    else if (std::abs(lane - playerLane) == 1) {
+        score += 50.0f;
+    }
+    // Penalize lanes that are too far from player
+    else if (std::abs(lane - playerLane) > 1) {
+        score -= 100.0f;
     }
 
     return score;

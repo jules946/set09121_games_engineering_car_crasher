@@ -16,7 +16,7 @@ private:
     bool _isGoodObstacle;
 
     static constexpr float EASY_SPAWN_INTERVAL = 2.0f;
-    static constexpr float HARD_SPAWN_INTERVAL = 1.2f;
+    static constexpr float HARD_SPAWN_INTERVAL = 0.8f;
     float _spawnInterval;
 
     // Track obstacles per lane

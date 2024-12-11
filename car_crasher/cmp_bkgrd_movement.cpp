@@ -1,12 +1,14 @@
 //cmp_bkgrd_movement.cpp
 #include "cmp_bkgrd_movement.h"
 #include "car_crasher.h"
+#include "game_config.h"
 
 
 // Constructor
-BackgroundMovementComponent::BackgroundMovementComponent(Entity* p, float scrollSpeed, float screenHeight, float tileHeight)
-    : ActorMovementComponent(p), _screenHeight(screenHeight), _tileHeight(tileHeight) {
-    setSpeed(scrollSpeed); // Use inherited speed functionality
+BackgroundMovementComponent::BackgroundMovementComponent(Entity* p, float tileHeight)
+    : ActorMovementComponent(p), _screenHeight(gameHeight), _tileHeight(tileHeight) {
+    const float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
+    setSpeed(baseSpeed * speedMultiplier);
 }
 
 // Update method
@@ -28,7 +30,6 @@ void BackgroundMovementComponent::update(double dt) {
     _parent->setPosition(pos);
 }
 
-// Render method
 void BackgroundMovementComponent::render() {
     // No rendering logic needed
 }

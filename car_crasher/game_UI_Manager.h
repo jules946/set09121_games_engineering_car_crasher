@@ -2,8 +2,6 @@
 #ifndef GAME_UI_MANAGER_H
 #define GAME_UI_MANAGER_H
 
-#include <memory>
-#include "ecm.h"
 #include "entity_manager.h"
 #include "SFML/Graphics/Texture.hpp"
 #include <SFML/Graphics.hpp>

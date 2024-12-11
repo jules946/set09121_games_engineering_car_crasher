@@ -11,7 +11,7 @@ private:
 
 public:
     // Constructor
-    explicit BackgroundMovementComponent(Entity* p, float scrollSpeed, float screenHeight, float tileHeight);
+    explicit BackgroundMovementComponent(Entity* p, float tileHeight);
 
     // Override update method to handle scrolling logic
     void update(double dt) override;

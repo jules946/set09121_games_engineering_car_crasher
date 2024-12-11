@@ -199,7 +199,6 @@ void GameScene::update(const double dt) {
         }
         _firstUpdate = false;
     }
-    // std::cout << "Game scene update" << std::endl;
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
         stopSounds();
         activeScene = pauseScene;

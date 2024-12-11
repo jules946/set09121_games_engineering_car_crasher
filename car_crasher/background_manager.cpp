@@ -28,8 +28,6 @@ void backgroundManager::loadBackground(EntityManager& entityManager) {
             s->getSprite().setOrigin(0, 0);
 
             tile->addComponent<BackgroundMovementComponent>(
-                100.0f,
-                gameHeight,
                 textureSize.y * tileScaleY - overlap
             );
 
