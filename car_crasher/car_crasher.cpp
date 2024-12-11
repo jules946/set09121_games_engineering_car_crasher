@@ -18,19 +18,6 @@
 #include "cmp_police_ai_movement.h"
 
 
-// TODO
-// Obstacle Manager -- Alessio
-//- add good obstacles e.g. heart - done
-//- if car drives over heart ++lives - done
-
-//Main Menu -- Alessio
-//- Add text to let player know to click a button to start game - Done
-//- Add car change functionality
-//- Add keybind functionality - 90% done, working, only to perfection it
-//- Add difficulity functionality
-//- Add pause menu to gameScene - Done
-
-
 using namespace sf;
 using namespace std;
 
@@ -39,9 +26,10 @@ bool isHardDifficulty = false;
 
 std::unique_ptr<KeyBindComponent> keyBindComponent;
 
-
+// Default car selection to Blue Car
 std::string selectedCar = "Blue Car";
 
+// Map to hold different car res paths
 const std::map<std::string, std::string> CAR_CONFIGS = {
     std::make_pair("Blue Car", "res/img/BlueCar.png"),
     std::make_pair("Grey Car", "res/img/Car_Grey.png"),
@@ -49,24 +37,18 @@ const std::map<std::string, std::string> CAR_CONFIGS = {
     std::make_pair("Striped Car", "res/img/Car_Striped.png")
 };
 
-// MenuScene class implementation
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
 
-    // Debug before creating component
-    std::cout << "Before component creation - gameScene: " << gameScene << std::endl;
-
     // Create menu controller entity
-    auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::MAIN);
-    // Debug after
-    std::cout << "After component creation - gameScene: " << gameScene << std::endl;
+    const auto menuEntity = std::make_shared<Entity>();
+    const auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::MAIN);
 
     // Create title
-    auto title = std::make_shared<Entity>();
-    auto titleText = title->addComponent<TextComponent>("Car Crasher");
+    const auto title = std::make_shared<Entity>();
+    const auto titleText = title->addComponent<TextComponent>("Car Crasher");
     titleText->setCharacterSize(48);
     title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
     titleText->centerOrigin();
@@ -77,7 +59,8 @@ void MenuScene::load() {
         "Play Game",
         "Choose Different Car",
         "Difficulty: " + std::string(isHardDifficulty ? "Hard" : "Easy"),
-        "Key Binds"
+        "Key Binds",
+        "Quit Game"
     };
 
     _entity_manager.list.push_back(menuEntity);

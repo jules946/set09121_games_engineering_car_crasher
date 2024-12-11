@@ -60,9 +60,9 @@ MenuComponent::MenuComponent(Entity* p, const MenuType type)
 void MenuComponent::update(double dt) {
     static bool upPressed = false;
     static bool downPressed = false;
-    static bool spacePressed = false;
     static bool returnPressed = false;
     static sf::Clock inputDelay;
+    static bool quitConfirmationActive = false;
 
     if (_type == MenuType::MAIN) {
         // Main Menu Logic
@@ -82,7 +82,7 @@ void MenuComponent::update(double dt) {
     }
 
     // Common navigation code for both menu types
-    if (_state != MenuState::TITLE) {
+  if (_state != MenuState::TITLE) {
         if (inputDelay.getElapsedTime().asSeconds() > 0.15f) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !upPressed) {
                 _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(false);
@@ -108,7 +108,6 @@ void MenuComponent::update(double dt) {
                 if (_selectedOption == 0) {  // Play Game
                     gameScene->reset();
                     activeScene = gameScene;
-
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;
                     sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
@@ -118,10 +117,16 @@ void MenuComponent::update(double dt) {
                     _menuItems[2]->getComponent<TextComponent>()->setText(
                         "Difficulty: " + std::string(isHardDifficulty ? "Hard" : "Easy")
                     );
-                }
-                else if (_selectedOption == 3) {  // Key Binds option
+                } else if (_selectedOption == 3) {  // Key Binds option
                     activeScene = keyBindScene;
                     sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
+                } else if (_selectedOption == 4) {  // Quit option
+                    if (!quitConfirmationActive) {
+                        _menuItems[4]->getComponent<TextComponent>()->setText("Are you sure?");
+                        quitConfirmationActive = true;
+                    } else {
+                        Renderer::getWindow().close();
+                    }
                 }
             } else if (_type == MenuType::PAUSE) {
                 if (_selectedOption == 0) {  // "Yes, please"
@@ -130,8 +135,6 @@ void MenuComponent::update(double dt) {
                 } else if (_selectedOption == 1) {  // "No, go back to the game"
                     activeScene = gameScene;
                     gameScene->resumeSounds();
-
-
                 }
             }
             returnPressed = true;  // Set returnPressed only after scene transition logic
@@ -139,6 +142,11 @@ void MenuComponent::update(double dt) {
             returnPressed = false;  // Reset when Return key is released
         }
 
+        // Reset quit confirmation if user moves away from quit option
+        if (_selectedOption != 4 && quitConfirmationActive) {
+            quitConfirmationActive = false;
+            _menuItems[4]->getComponent<TextComponent>()->setText("Quit");
+        }
     }
 
     // Update visibility

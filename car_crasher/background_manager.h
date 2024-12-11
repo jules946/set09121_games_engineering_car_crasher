@@ -6,7 +6,7 @@
 
 class backgroundManager {
 private:
-    sf::Texture roadTexture; // Store texture persistently
+    sf::Texture roadTexture;
 
 public:
     void loadBackground(EntityManager &entityManager);
