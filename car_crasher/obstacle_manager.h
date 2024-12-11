@@ -1,30 +1,36 @@
-//obstacle_manager.h
+// obstacle_manager.h
 #pragma once
-#include "ecm.h"
-#include "entity_manager.h"
-#include <SFML/Graphics.hpp>
-#include <vector>
+#include <ecm.h>
+#include <SFML/System/Clock.hpp>
+#include <array>
+#include <memory>
 #include <string>
+#include "game_config.h"
+#include "entity_manager.h"
 
 class ObstacleManager {
 private:
-    float _spawnInterval;
+    EntityManager& _entityManager;
     sf::Clock _spawnClock;
     std::vector<std::string> _obstacleSprites;
-    EntityManager& _entityManager;
     bool _isGoodObstacle;
-    const float EASY_SPAWN_INTERVAL = 2.0f;
-    const float HARD_SPAWN_INTERVAL = 1.2f;
+
+    static constexpr float EASY_SPAWN_INTERVAL = 2.0f;
+    static constexpr float HARD_SPAWN_INTERVAL = 1.2f;
+    float _spawnInterval;
+
+    // Track obstacles per lane
+    std::array<float, numLanes> lastObstacleYPos;
+
+    // Helper functions
+    int findBestLane() const;
+    void updateLaneTracking();
+    const std::string& getRandomSprite() const;
 
 public:
     explicit ObstacleManager(EntityManager& entityManager);
-    
     void addObstacleSprite(const std::string& spritePath);
-    void setSpawnInterval(float interval) { _spawnInterval = interval; }
-    void update(double dt);
     void initializeSprites();
-
-private:
+    void update(double dt);
     std::shared_ptr<Entity> createObstacle();
-    const std::string& getRandomSprite() const;
 };

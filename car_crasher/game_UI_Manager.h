@@ -6,6 +6,7 @@
 #include "ecm.h"
 #include "entity_manager.h"
 #include "SFML/Graphics/Texture.hpp"
+#include <SFML/Graphics.hpp>
 
 using namespace sf;
 

@@ -27,12 +27,9 @@ protected:
     static constexpr float baseSpeed = 200.0f;
 
 public:
-    explicit ObstacleMovementComponent(Entity* p);
+    explicit ObstacleMovementComponent(Entity* p, int bestLane);
     void update(double dt) override;
     int getLane() const { return _lane; }
-    void updateSpeedForDifficulty() {
-        float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
-        setSpeed(baseSpeed * speedMultiplier);
-    }
+
 };
 

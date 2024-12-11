@@ -9,10 +9,9 @@ void ActorMovementComponent::update(double dt) {}
 ActorMovementComponent::ActorMovementComponent(Entity* p)
     : Component(p), _speed(100.0f) {}
 
-ObstacleMovementComponent::ObstacleMovementComponent(Entity* p)
-    : ActorMovementComponent(p) {
-    _lane = rand() % numLanes;
-    float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
+ObstacleMovementComponent::ObstacleMovementComponent(Entity* p, int bestLane)
+    : ActorMovementComponent(p), _lane(bestLane) {
+    const float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
     setSpeed(baseSpeed * speedMultiplier);
 }
 
