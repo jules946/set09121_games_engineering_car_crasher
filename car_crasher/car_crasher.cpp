@@ -37,21 +37,16 @@ using namespace std;
 int score;
 
 std::unique_ptr<KeyBindComponent> keyBindComponent;
-static bool enterKeyReleased = false; // make sure Enter key is not registered before accessing KeyBindScene
 
-//CarType ChangeCarScene::selectedCar = CarType::BLUE;
-CarType selectedCar = CarType::BLUE;  // Move outside of ChangeCarScene
 
-std::string ChangeCarScene::getCarTexturePath(CarType car) {
-    switch (car) {
-        case CarType::BLUE: return "res/img/BlueCar.png";
-        case CarType::GREY: return "res/img/Car_Grey.png";
-        case CarType::RED: return "res/img/Car_Red.png";
-        case CarType::STRIPED: return "res/img/Car_Striped.png";
-        default: return "res/img/BlueCar.png";
-    }
-}
+std::string selectedCar = "Blue Car";
 
+const std::map<std::string, std::string> CAR_CONFIGS = {
+    {"Blue Car", "res/img/BlueCar.png"},
+    {"Grey Car", "res/img/Car_Grey.png"},
+    {"Red Car", "res/img/Car_Red.png"},
+    {"Striped Car", "res/img/Car_Striped.png"}
+};
 // MenuScene class implementation
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
@@ -145,11 +140,9 @@ void GameScene::load() {
     // Create player
     _player = make_shared<Entity>();
 
-    std::cout << "Loading car: " << static_cast<int>(selectedCar) << std::endl;
+    // std::cout << "Loading car: " << static_cast<int>(selectedCar) << std::endl;
     const auto s = _player->addComponent<SpriteComponent>(); // using const
-    //s->setTexture(ChangeCarScene::getCarTexturePath(ChangeCarScene::getSelectedCar()));
-    s->setTexture(ChangeCarScene::getCarTexturePath(selectedCar));
-
+    s->setTexture(CAR_CONFIGS.at(selectedCar));
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
@@ -185,7 +178,6 @@ void GameScene::load() {
     _cop->addComponent<SoundEffectComponent>("res/sound/police_siren.wav");
 
     _entity_manager.list.push_back(_cop);
-
 
 
     // UI for lives etc
@@ -366,23 +358,30 @@ void ChangeCarScene::load() {
     titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
     titleText.setOrigin(titleText.getLocalBounds().width / 2.f, titleText.getLocalBounds().height / 2.f);
 
-    std::vector<std::pair<std::string, std::string>> options = {
-        {"Blue Car", "res/img/BlueCar.png"},
-        {"Grey Car", "res/img/Car_Grey.png"},
-        {"Red Car", "res/img/Car_Red.png"},
-        {"Striped Car", "res/img/Car_Striped.png"}
-    };
-
+    carOptions.clear();
     float yPos = gameHeight / 2.f;
-    for (const auto& opt : options) {
+
+    // Create menu items from CAR_CONFIGS
+    for (const auto& [carName, spritePath] : CAR_CONFIGS) {
         sf::Text text;
         text.setFont(font);
-        text.setString(opt.first);
+        text.setString(carName);
         text.setCharacterSize(32);
         text.setPosition(gameWidth / 2.f, yPos);
         text.setOrigin(text.getLocalBounds().width / 2.f, text.getLocalBounds().height / 2.f);
-        carOptions.emplace_back(text, opt.second);
+        carOptions.emplace_back(text, spritePath);
         yPos += 60.f;
+    }
+
+    // Set initial selected option based on current selectedCar
+    selectedOption = 0;
+    int index = 0;
+    for (const auto& [carName, _] : CAR_CONFIGS) {
+        if (carName == selectedCar) {
+            selectedOption = index;
+            break;
+        }
+        index++;
     }
 }
 
@@ -409,8 +408,12 @@ void ChangeCarScene::update(double dt) {
     if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) downPressed = false;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
-        selectedCar = static_cast<CarType>(selectedOption);
-        std::cout << "Selected car: " << static_cast<int>(selectedCar) << std::endl;
+        // Convert selectedOption index to car name using the options vector
+        auto it = CAR_CONFIGS.begin();
+        std::advance(it, selectedOption);
+        selectedCar = it->first;  // Set the selected car name
+
+        std::cout << "Selected car: " << selectedCar << std::endl;
         activeScene = menuScene;
         returnPressed = true;
     }
@@ -418,6 +421,8 @@ void ChangeCarScene::update(double dt) {
 
     Scene::update(dt);
 }
+
+
 
 void ChangeCarScene::render() {
     Renderer::queue(&titleText);

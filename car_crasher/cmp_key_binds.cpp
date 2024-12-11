@@ -237,52 +237,7 @@ void KeyBindComponent::update(double dt) {
     }
 }
 
-
-// old code - old key binds update
-/*
-void KeyBindComponent::update(double dt) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-        activeScene = menuScene;
-        return;
-    }
-
-    if (_waitingForLeft) {
-        for (int k = 0; k < sf::Keyboard::KeyCount; ++k) {
-            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(k))) {
-                _leftKey = static_cast<sf::Keyboard::Key>(k);
-                _waitingForLeft = false;
-                _leftKeyText.setString("Left Key: " + std::to_string(k));
-                break;
-            }
-        }
-    }
-    else if (_waitingForRight) {
-        for (int k = 0; k < sf::Keyboard::KeyCount; ++k) {
-            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(k))) {
-                _rightKey = static_cast<sf::Keyboard::Key>(k);
-                _waitingForRight = false;
-                _rightKeyText.setString("Right Key: " + std::to_string(k));
-                break;
-            }
-        }
-    }
-    else {
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            sf::Vector2i mousePos = sf::Mouse::getPosition();
-            if (_leftKeyText.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                _waitingForLeft = true;
-                _leftKeyText.setString("Press new key for Left...");
-            }
-            else if (_rightKeyText.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                _waitingForRight = true;
-                _rightKeyText.setString("Press new key for Right...");
-            }
-        }
-    }
-}
-
-*/
-
+// Render function
 void KeyBindComponent::render() {
     Renderer::queue(&_titleText);
     Renderer::queue(&_leftKeyText);

@@ -3,6 +3,7 @@
 #define GAME_CONFIG_H
 
 #include <array>
+#include <map>
 
 // Game dimensions
 constexpr float gameWidth = 1920.0f;
@@ -26,10 +27,12 @@ constexpr std::array<float, numLanes> lanePositions = {
 constexpr float tileScaleY = 2.0f;
 constexpr float overlap = 1.0f;
 
-// Lives count
+// Game state
 extern int livesInt;
-
-// Score count
 extern int score;
+
+// Car configuration
+extern const std::map<std::string, std::string> CAR_CONFIGS;
+extern std::string selectedCar;
 
 #endif

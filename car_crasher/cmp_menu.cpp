@@ -107,7 +107,9 @@ void MenuComponent::update(double dt) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
             if (_type == MenuType::MAIN) {
                 if (_selectedOption == 0) {  // Play Game
+                    gameScene->reset();
                     activeScene = gameScene;
+
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;
                     sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
