@@ -128,30 +128,30 @@ KeyBindComponent::KeyBindComponent(Entity* p) : Component(p) {
     _titleText.setFont(_font);
     _titleText.setString("Key Binds");
     _titleText.setCharacterSize(48);
-    _titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
-    _titleText.setOrigin(_titleText.getLocalBounds().width / 2.f,
-                       _titleText.getLocalBounds().height / 2.f);
+    _titleText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 4.f));
+    _titleText.setOrigin(std::round(_titleText.getLocalBounds().width / 2.f),
+                         std::round(_titleText.getLocalBounds().height / 2.f));
 
     _leftKeyText.setFont(_font);
     _leftKeyText.setString("Left Key: " + keyToString(_leftKey));
     _leftKeyText.setCharacterSize(32);
-    _leftKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f - 50.f);
-    _leftKeyText.setOrigin(_leftKeyText.getLocalBounds().width / 2.f,
-                         _leftKeyText.getLocalBounds().height / 2.f);
+    _leftKeyText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 2.f - 50.f));
+    _leftKeyText.setOrigin(std::round(_leftKeyText.getLocalBounds().width / 2.f),
+                           std::round(_leftKeyText.getLocalBounds().height / 2.f));
 
     _rightKeyText.setFont(_font);
     _rightKeyText.setString("Right Key: " + keyToString(_rightKey));
     _rightKeyText.setCharacterSize(32);
-    _rightKeyText.setPosition(gameWidth / 2.f, gameHeight / 2.f + 50.f);
-    _rightKeyText.setOrigin(_rightKeyText.getLocalBounds().width / 2.f,
-                          _rightKeyText.getLocalBounds().height / 2.f);
+    _rightKeyText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 2.f + 50.f));
+    _rightKeyText.setOrigin(std::round(_rightKeyText.getLocalBounds().width / 2.f),
+                            std::round(_rightKeyText.getLocalBounds().height / 2.f));
 
     _promptText.setFont(_font);
     _promptText.setString("Select key to change, ESC to return");
     _promptText.setCharacterSize(24);
-    _promptText.setPosition(gameWidth / 2.f, gameHeight * 3.f / 4.f);
-    _promptText.setOrigin(_promptText.getLocalBounds().width / 2.f,
-                        _promptText.getLocalBounds().height / 2.f);
+    _promptText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight * 3.f / 4.f));
+    _promptText.setOrigin(std::round(_promptText.getLocalBounds().width / 2.f),
+                          std::round(_promptText.getLocalBounds().height / 2.f));
 }
 
 

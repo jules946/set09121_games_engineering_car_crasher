@@ -355,8 +355,8 @@ void ChangeCarScene::load() {
     titleText.setFont(font);
     titleText.setString("Choose Your Car");
     titleText.setCharacterSize(48);
-    titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
-    titleText.setOrigin(titleText.getLocalBounds().width / 2.f, titleText.getLocalBounds().height / 2.f);
+    titleText.setOrigin(std::round(titleText.getLocalBounds().width / 2.f), std::round(titleText.getLocalBounds().height / 2.f));
+    titleText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 4.f));
 
     carOptions.clear();
     float yPos = gameHeight / 2.f;
@@ -367,8 +367,8 @@ void ChangeCarScene::load() {
         text.setFont(font);
         text.setString(carName);
         text.setCharacterSize(32);
-        text.setPosition(gameWidth / 2.f, yPos);
-        text.setOrigin(text.getLocalBounds().width / 2.f, text.getLocalBounds().height / 2.f);
+        text.setOrigin(std::round(text.getLocalBounds().width / 2.f), std::round(text.getLocalBounds().height / 2.f));
+        text.setPosition(std::round(gameWidth / 2.f), std::round(yPos));
         carOptions.emplace_back(text, spritePath);
         yPos += 60.f;
     }
