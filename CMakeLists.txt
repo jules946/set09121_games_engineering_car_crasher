@@ -57,9 +57,10 @@ target_link_libraries(lib_ecm PRIVATE lib_maths)
 
 ## Car Crasher
 file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
-add_executable(CAR_CRASHER ${SOURCES})
+add_executable(CAR_CRASHER WIN32 ${SOURCES})
 target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS} "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher")
-target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)
+target_link_libraries(CAR_CRASHER PRIVATE sfml-graphics sfml-audio sfml-window sfml-system sfml-main lib_ecm)
+
 
 # Copy the OpenAL32.dll file to the output directory to get audio working
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
