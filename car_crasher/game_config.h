@@ -29,7 +29,4 @@ constexpr float overlap = 1.0f;
 // Lives count
 extern int livesInt;
 
-// Score count
-extern int score;
-
 #endif

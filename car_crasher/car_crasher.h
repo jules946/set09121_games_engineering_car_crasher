@@ -38,7 +38,6 @@ private:
 
     sf::Font font;
     sf::Text livesText;
-    sf::Text scoreText;
     bool _firstUpdate = true;
 public:
     GameScene() : _obstacleManager(nullptr) {}
@@ -63,9 +62,7 @@ class GameOverScene : public Scene {
 private:
     sf::Font font;
     sf::Text gameOverText;
-    sf::Text gameOverScoreText;
     sf::Text promptText;
-    gameUIManager _gameUIManager;
 public:
     void load() override;
     void update(double dt) override;
