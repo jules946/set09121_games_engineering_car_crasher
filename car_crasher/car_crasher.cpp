@@ -63,7 +63,7 @@ void MenuScene::load() {
 
     // Create menu controller entity
     auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::MAIN);
+    auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::MAIN);
     // Debug after
     std::cout << "After component creation - gameScene: " << gameScene << std::endl;
 
@@ -201,19 +201,7 @@ void GameScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
-    /*
-    livesText.setFont(font); // Set the font of the text
-    livesText.setCharacterSize(24); // Set the character size
-    livesText.setFillColor(sf::Color::White); // Set the text color
-    livesText.setString("Lives:");
-    // Get text bounds
-    const FloatRect bounds = livesText.getLocalBounds();
 
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    livesText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    livesText.setPosition(gameWidth - 270.f, 40.f);
-    */
     // Loads the lives text
     _gameUIManager.loadLivesText(font, livesText);
 
@@ -233,6 +221,7 @@ void GameScene::update(const double dt) {
     }
     // std::cout << "Game scene update" << std::endl;
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
+        stopSounds();
         activeScene = pauseScene;
     }
     
@@ -248,7 +237,7 @@ void GameScene::update(const double dt) {
     _gameUIManager.update(dt, _entity_manager);
 
     if (livesInt <= 0 && activeScene != gameOverScene) {
-        pauseSounds();
+        stopSounds();
         activeScene = gameOverScene;
     }
     // Loads the lives text
@@ -259,6 +248,14 @@ void GameScene::update(const double dt) {
     Scene::update(dt);
 }
 
+void GameScene::reset() {
+    livesInt = 3;
+    score = 0;
+    _firstUpdate = true;
+    _entity_manager.list.clear();
+    load();
+}
+
 // Add all entities to the renderer queue
 void GameScene::render() {
     Scene::render();
@@ -267,36 +264,6 @@ void GameScene::render() {
     Renderer::queue(&pauseText);
 }
 
-
-// Created to stop the screeching sound while the game is paused
-void GameScene::pauseSounds() {
-    std::cout << "Pausing sounds..." << std::endl;
-    if (auto sound = _player->getComponent<SoundEffectComponent>()) {
-        std::cout << "Found player sound component" << std::endl;
-        sound->stopSound();
-    }
-
-    for (auto& entity : _entity_manager.list) {
-        if (auto sound = entity->getComponent<SoundEffectComponent>()) {
-            std::cout << "Found entity sound component" << std::endl;
-            sound->stopSound();
-        }
-    }
-
-    // TODO make sure police sounds stop in pause menu
-    // Stop the police siren sound specifically
-    //if (_cop) {
-      //  if (auto copSound = _cop->getComponent<SoundEffectComponent>()) {
-        //    auto status = copSound->getSoundStatus(); // Add a method to return _sound.getStatus()
-          //  std::cout << "Cop sound status before stopping: "
-            //          << (status == sf::Sound::Playing ? "Playing" : "Not Playing") << std::endl;
-            //copSound->stopSound();
-        //}
-    //}
-
-
-
-}
 
 void PauseScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
@@ -324,7 +291,7 @@ void PauseScene::load() {
 
     float yPos = gameHeight / 1.5f;
     auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::PAUSE);
+    auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::PAUSE);
 
     for (const auto& opt : options) {
         auto item = std::make_shared<Entity>();

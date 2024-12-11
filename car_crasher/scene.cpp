@@ -2,6 +2,7 @@
 #include "scene.h"
 
 #include "cmp_key_binds.h"
+#include "cmp_sound_effect.h"
 
 std::shared_ptr<Scene> activeScene;
 std::shared_ptr<Scene> menuScene;
@@ -20,11 +21,28 @@ std::vector<std::shared_ptr<Entity>>& Scene::getEnts() {
 // Will be overridden per scene
 void Scene::load() {}
 
+void Scene::reset() {}
+
 // Update all entities in the scene
 void Scene::update(const double dt) { _entity_manager.update(dt); }
 
 // Render all entities in the scene
 void Scene::render() { _entity_manager.render(); }
+
+void Scene::stopSounds() const {
+    for (auto& entity : _entity_manager.list) {
+        if (const auto sound = entity->getComponent<SoundEffectComponent>()) {
+            sound->stopSound();
+        }
+    }
+}
+void Scene::resumeSounds() const {
+    for (auto& entity : _entity_manager.list) {
+        if (const auto sound = entity->getComponent<SoundEffectComponent>()) {
+            sound->playSound();
+        }
+    }
+}
 
 std::shared_ptr<Entity> Scene::makeEntity() {
     // Create a new entity

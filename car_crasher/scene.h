@@ -9,8 +9,15 @@ public:
     virtual ~Scene() = default;
     virtual void update(double dt);
     virtual void render();
+
+    void stopSounds() const;
+
     virtual void load() = 0;
+    virtual void reset();
     std::vector<std::shared_ptr<Entity>> &getEnts();
+
+    void resumeSounds() const;
+
     // Create and add an entity to the scene
     std::shared_ptr<Entity> makeEntity();
 

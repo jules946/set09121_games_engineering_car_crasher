@@ -5,7 +5,6 @@
 #include "game_config.h"
 #include "system_renderer.h"
 #include "scene.h"
-#include "game_UI_Manager.h"
 
 
 // TextComponent implementation
@@ -54,16 +53,11 @@ void TextComponent::centerOrigin() {
 
 
 // MenuComponent implementation
-MenuComponent::MenuComponent(Entity* p,
-                           std::shared_ptr<Scene>& activeScene,
-                           std::shared_ptr<Scene>& gameScene,
-                           MenuType type)
+MenuComponent::MenuComponent(Entity* p, const MenuType type)
     : Component(p),
       _state(MenuState::TITLE),
-      _selectedOption(0),
-      _activeScene(activeScene),
-      _gameScene(gameScene),
-      _type(type) { }
+      _type(type),
+      _selectedOption(0) { }
 
 void MenuComponent::update(double dt) {
     static bool upPressed = false;
@@ -114,8 +108,9 @@ void MenuComponent::update(double dt) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
             if (_type == MenuType::MAIN) {
                 if (_selectedOption == 0) {  // Play Game
-                    gameScene = std::make_shared<GameScene>();  // Always create new scene
-                    gameScene->load();  // This will use the currently selected car
+                    // gameScene = std::make_shared<GameScene>();  // Always create new scene
+                    // gameScene->load();  // This will use the currently selected car
+                    // gameScene->Reset();
                     activeScene = gameScene;
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;
@@ -127,12 +122,13 @@ void MenuComponent::update(double dt) {
                 }
             } else if (_type == MenuType::PAUSE) {
                 if (_selectedOption == 0) {  // "Yes, please"
-                    gameScene = std::make_shared<GameScene>();
-                    livesInt = 3;  // Reset lives
-                    gameScene->load();
                     activeScene = menuScene;
+                    gameScene->reset();
                 } else if (_selectedOption == 1) {  // "No, go back to the game"
                     activeScene = gameScene;
+                    gameScene->resumeSounds();
+
+
                 }
             }
             returnPressed = true;  // Set returnPressed only after scene transition logic
@@ -149,75 +145,7 @@ void MenuComponent::update(double dt) {
 }
 
 
-
-
 void MenuComponent::addMenuItem(const std::shared_ptr<Entity>& item) {
     _menuItems.push_back(item);
 }
 
-
-/*
-
-void MenuComponent::update(double dt) {
-    static bool upPressed = false;
-    static bool downPressed = false;
-    static bool spacePressed = false;
-    static bool returnPressed = false;
-    static sf::Clock inputDelay;
-
-    if (_state == MenuState::TITLE) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spacePressed) {
-            _state = MenuState::MAIN_MENU;
-            spacePressed = true;
-        }
-        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            spacePressed = false;
-        }
-    }
-    else if (_state == MenuState::MAIN_MENU) {
-        if (inputDelay.getElapsedTime().asSeconds() > 0.15f) {  // Add delay between inputs
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !upPressed) {
-                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(false);
-                _selectedOption = (_selectedOption - 1 + _menuItems.size()) % _menuItems.size();
-                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(true);
-                upPressed = true;
-                inputDelay.restart();
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !downPressed) {
-                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(false);
-                _selectedOption = (_selectedOption + 1) % _menuItems.size();
-                _menuItems[_selectedOption]->getComponent<TextComponent>()->setSelected(true);
-                downPressed = true;
-                inputDelay.restart();
-            }
-        }
-
-        if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) upPressed = false;
-        if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) downPressed = false;
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed && _selectedOption == 0) {
-
-            std::cout << "GameScene pointer: " << gameScene << std::endl;
-            std::cout << "GameScene entities: " << gameScene->getEnts().size() << std::endl;
-
-
-            // Add debug print
-            std::cout << "Attempting scene transition" << std::endl;
-            activeScene = gameScene;  // Use global activeScene instead of _activeScene
-            //_activeScene = _gameScene;
-            returnPressed = true;
-        }
-        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-            returnPressed = false;
-        }
-    }
-
-
-
-    // Update visibility
-    for (auto& item : _menuItems) {
-        item->setVisible(_state == MenuState::MAIN_MENU);
-    }
-}
-
-*/

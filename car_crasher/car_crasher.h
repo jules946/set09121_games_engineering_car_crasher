@@ -47,9 +47,11 @@ private:
 public:
     GameScene() : _obstacleManager(nullptr) {}
     void update(double dt) override;
+
+    void reset() override;
+
     void render() override;
     void load() override;
-    void pauseSounds();
 };
 
 class PauseScene : public Scene {

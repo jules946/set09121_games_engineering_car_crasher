@@ -36,10 +36,7 @@ protected:
     std::shared_ptr<Scene> _gameScene;
 
 public:
-    explicit MenuComponent(Entity* p,
-                          std::shared_ptr<Scene>& activeScene,
-                          std::shared_ptr<Scene>& gameScene,
-                          MenuType type = MenuType::MAIN);
+    explicit MenuComponent(Entity* p, MenuType type = MenuType::MAIN);
 
     void update(double dt) override;
     void render() override {}
