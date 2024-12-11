@@ -35,6 +35,7 @@ using namespace sf;
 using namespace std;
 
 int score;
+bool isHardDifficulty = false;
 
 std::unique_ptr<KeyBindComponent> keyBindComponent;
 
@@ -74,7 +75,7 @@ void MenuScene::load() {
     std::vector<std::string> options = {
         "Play Game",
         "Choose Different Car",
-        "Difficulty",
+        "Difficulty: " + std::string(isHardDifficulty ? "Hard" : "Easy"),
         "Key Binds"
     };
 
@@ -421,7 +422,6 @@ void ChangeCarScene::update(double dt) {
 
     Scene::update(dt);
 }
-
 
 
 void ChangeCarScene::render() {

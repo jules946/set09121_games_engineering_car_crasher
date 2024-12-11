@@ -2,7 +2,6 @@
 #include "cmp_menu.h"
 
 #include "car_crasher.h"
-#include "game_config.h"
 #include "system_renderer.h"
 #include "scene.h"
 
@@ -113,6 +112,12 @@ void MenuComponent::update(double dt) {
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;
                     sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
+                } else if (_selectedOption == 2) {  // Toggle Difficulty
+                    isHardDifficulty = !isHardDifficulty;
+                    // Update the menu text
+                    _menuItems[2]->getComponent<TextComponent>()->setText(
+                        "Difficulty: " + std::string(isHardDifficulty ? "Hard" : "Easy")
+                    );
                 }
                 else if (_selectedOption == 3) {  // Key Binds option
                     activeScene = keyBindScene;

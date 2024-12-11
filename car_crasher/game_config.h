@@ -35,4 +35,6 @@ extern int score;
 extern const std::map<std::string, std::string> CAR_CONFIGS;
 extern std::string selectedCar;
 
+// Difficulty
+extern bool isHardDifficulty;
 #endif

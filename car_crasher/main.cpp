@@ -57,7 +57,7 @@ int main() {
         Load(); // Load resources and initialize scenes
 
         while (window.isOpen()) {
-            Event event;
+            Event event{};
             while (window.pollEvent(event)) {
                 // if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 //     window.close();
