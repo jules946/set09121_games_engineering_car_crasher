@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "ecm.h"
 
-class HitboxComponent : public Component {
+class HitboxComponent final : public Component {
 private:
     sf::FloatRect _bounds;
 

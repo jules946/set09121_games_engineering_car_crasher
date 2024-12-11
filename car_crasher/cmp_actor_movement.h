@@ -26,8 +26,9 @@ protected:
     int _lane;
 
 public:
-    explicit ObstacleMovementComponent(Entity* p);
+    explicit ObstacleMovementComponent(Entity* p, int bestLane, float speed);
     void update(double dt) override;
     int getLane() const { return _lane; }
+
 };
 

@@ -57,23 +57,24 @@ target_link_libraries(lib_ecm PRIVATE lib_maths)
 
 ## Car Crasher
 file(GLOB_RECURSE SOURCES car_crasher/*.cpp car_crasher/*.h)
-# Explicitly add obstacle files
-# Explicitly add files
-list(APPEND SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/scene.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/obstacle_manager.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/background_manager.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher/cmp_menu.cpp"
-)
-add_executable(CAR_CRASHER ${SOURCES})
+add_executable(CAR_CRASHER WIN32 ${SOURCES})
 target_include_directories(CAR_CRASHER PRIVATE ${SFML_INCS} "${CMAKE_CURRENT_SOURCE_DIR}/car_crasher")
-target_link_libraries(CAR_CRASHER sfml-graphics sfml-audio lib_ecm)
+target_link_libraries(CAR_CRASHER PRIVATE sfml-graphics sfml-audio sfml-window sfml-system sfml-main lib_ecm)
+
 
 # Copy the OpenAL32.dll file to the output directory to get audio working
-if (WIN32)
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    # For Visual Studio: copy to Debug/Release-specific directories
     add_custom_command(TARGET CAR_CRASHER POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/OpenAL32.dll"
+            "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/openal32.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/"
+    )
+else()
+    # For CLion (or other non-Visual Studio generators): copy to runtime directory
+    add_custom_command(TARGET CAR_CRASHER POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PROJECT_SOURCE_DIR}/lib/sfml/extlibs/bin/x64/openal32.dll"
             "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
     )
 endif()
@@ -89,3 +90,49 @@ endif()
 
 # Make sure that the 'copy_resources' target is executed before building Tile Engine
 add_dependencies(CAR_CRASHER copy_resources)
+
+
+## Installer Stuff
+#Install directory within build folder, so it doesn't go into /lib or program-files
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/")
+#Installer.exe/zip built into /installer
+SET(CPACK_PACKAGE_DIRECTORY "${CMAKE_BINARY_DIR}/installer/")
+#Install component for runtime dlls and stuff
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE) #stop this happening on non-release builds
+INCLUDE(InstallRequiredSystemLibraries)
+install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "bin/" CONFIGURATIONS Release COMPONENT SYSTEM_CMPT)
+#Install component for resources
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/res" DESTINATION "bin/" CONFIGURATIONS Release COMPONENT RESOURCES_CMPT)
+#We disabled SFML's INSTALL component as it brings along junk, so we gotta make one ourselves
+install(DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/" DESTINATION "bin" CONFIGURATIONS Release COMPONENT SFML_CMPT FILES_MATCHING PATTERN "*.dll" )
+#Main Install target
+install(TARGETS CAR_CRASHER DESTINATION "bin" CONFIGURATIONS Release COMPONENT CAR_CRASHER_CMPT)
+
+#Tell CPack about the libs and resources install components
+set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} RESOURCES_CMPT SFML_CMPT SYSTEM_CMPT CAR_CRASHER_CMPT)
+set(CPACK_COMPONENT_CAR_CRASHER_CMPT_DEPENDS RESOURCES_CMPT SFML_CMPT SYSTEM_CMPT)
+set(CPACK_COMPONENT_RESOURCES_CMPT_REQUIRED TRUE)
+set(CPACK_COMPONENT_SFML_CMPT_REQUIRED TRUE)
+set(CPACK_COMPONENT_SYSTEM_CMPT_REQUIRED TRUE)
+set(CPACK_COMPONENT_CAR_CRASHER_CMPT_DISPLAY_NAME "Car Crasher")
+
+IF(WIN32)
+    set(CPACK_GENERATOR NSIS)
+    set(CPACK_NSIS_COMPONENT_INSTALL ON)
+    set(CPACK_NSIS_HELP_LINK "https://github.com/jules946/set09121_games_engineering_car_crasher")
+    set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/jules946/set09121_games_engineering_car_crasher")
+    set(CPACK_NSIS_CONTACT "https://github.com/jules946/set09121_games_engineering_car_crasher")
+ELSE()
+    set(CPACK_GENERATOR ZIP)
+ENDIF(WIN32)
+
+
+set(CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Car Crasher")
+set(CPACK_PACKAGE_VENDOR "Julius, Alessio, and Luke")
+
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+INCLUDE(CPack)

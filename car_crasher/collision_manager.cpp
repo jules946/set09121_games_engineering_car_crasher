@@ -2,6 +2,7 @@
 #include "collision_manager.h"
 #include "cmp_hit_box.h"
 #include "cmp_sprite.h"
+#include "game_config.h"
 
 void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const std::shared_ptr<Entity>& player,
     const std::shared_ptr<Entity>& cop) {
@@ -9,7 +10,7 @@ void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const
     if (!player) return;
 
     // check if player hitbox exists
-    auto playerHB = player->getComponent<HitboxComponent>();
+    const auto playerHB = player->getComponent<HitboxComponent>();
     if (!playerHB) return;
 
     auto& entities = entityManager.list;
@@ -17,7 +18,7 @@ void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const
         // Skip player and police car
         if (entity == player || entity == cop) continue;
 
-        auto obstacleBB = entity->getComponent<HitboxComponent>();
+        const auto obstacleBB = entity->getComponent<HitboxComponent>();
         if (!obstacleBB) continue;
 
         // check for obstacle between player and obstacle
@@ -27,7 +28,7 @@ void CollisionManager::checkPlayerCollisions(EntityManager& entityManager, const
     }
 }
 void CollisionManager::handlePlayerCollision(const std::shared_ptr<Entity>& player, const std::shared_ptr<Entity>& obstacle) {
-    auto sprite = obstacle->getComponent<SpriteComponent>();
+    const auto sprite = obstacle->getComponent<SpriteComponent>();
 
     if (sprite->getTexturePath() == "res/img/heartLife.png") {
         if (livesInt < 3) {  // Only increment if less than max
@@ -39,14 +40,4 @@ void CollisionManager::handlePlayerCollision(const std::shared_ptr<Entity>& play
 
     obstacle->setForDelete();
 
-// old code - to keep the to do
-/*
-    // TODO: Implement collision handling
-    std::cout << "Collision detected between player and obstacle!" << std::endl;
-    // For now, just remove the obstacle
-    obstacle->setForDelete();
-
-    // Decrement livesInt to remove a heart
-    livesInt--;
-    */
 }

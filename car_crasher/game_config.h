@@ -3,6 +3,7 @@
 #define GAME_CONFIG_H
 
 #include <array>
+#include <map>
 
 // Game dimensions
 constexpr float gameWidth = 1920.0f;
@@ -22,11 +23,21 @@ constexpr std::array<float, numLanes> lanePositions = {
     startX + columnWidth * 3.5f  // Lane 4
 };
 
+// Base speed for non-car obstacles and background
+constexpr float baseSpeed = 200.0f;
+
 // Other shared constants (e.g., tile size, overlap)
 constexpr float tileScaleY = 2.0f;
 constexpr float overlap = 1.0f;
 
-// Lives count
+// Game state
 extern int livesInt;
+extern int score;
 
+// Car configuration
+extern const std::map<std::string, std::string> CAR_CONFIGS;
+extern std::string selectedCar;
+
+// Difficulty
+extern bool isHardDifficulty;
 #endif

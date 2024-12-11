@@ -6,12 +6,15 @@
 #include <SFML/Graphics.hpp>
 
 void backgroundManager::loadBackground(EntityManager& entityManager) {
+    // Load Road Texture
     if (!roadTexture.loadFromFile("res/img/road2.png")) {
         throw std::runtime_error("Failed to load road texture!");
     }
-    const sf::Vector2f textureSize(roadTexture.getSize().x, roadTexture.getSize().y);
+
+    // Scale
+    const Vector2f textureSize(roadTexture.getSize().x, roadTexture.getSize().y);
     const float scaleX = columnWidth / textureSize.x;
-    const float scaledWidth = textureSize.x * scaleX;  // Width of the road tile after scaling
+    const float scaledWidth = textureSize.x * scaleX;
 
     // Create road lanes
     for (int lane = 0; lane < numLanes; ++lane) {
@@ -27,9 +30,8 @@ void backgroundManager::loadBackground(EntityManager& entityManager) {
             s->getSprite().setScale(scaleX, tileScaleY);
             s->getSprite().setOrigin(0, 0);
 
+            // Add movement component for scrolling
             tile->addComponent<BackgroundMovementComponent>(
-                100.0f,
-                gameHeight,
                 textureSize.y * tileScaleY - overlap
             );
 

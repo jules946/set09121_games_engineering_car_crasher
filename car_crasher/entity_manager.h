@@ -13,6 +13,7 @@ struct EntityManager {
 
     // Update all entities
     void update(double dt);
+
     // Add all entities to the renderer queue
     void render() const;
 };

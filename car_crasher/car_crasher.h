@@ -8,19 +8,17 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-
 // Forward declaration of MenuScene class
 class MenuScene final : public Scene {
 private:
-    sf::Font font;
-    sf::Text text;
-    sf::Text promptText;
-    sf::Clock blinkClock;
+    Font font;
+    Text text;
+    Text promptText;
+    Clock blinkClock;
     bool showPrompt;
 
 public:
     MenuScene() : showPrompt(true) {}
-    // MenuScene() = default;
     void update(double dt) override;
     void render() override;
     void load()override;
@@ -36,20 +34,25 @@ private:
     CollisionManager _collisionManager;
     gameUIManager _gameUIManager;
 
-    sf::Font font;
-    sf::Text livesText;
+    Font font;
+    Text livesText;
+    Text scoreText;
+    Text pauseText;
     bool _firstUpdate = true;
 public:
     GameScene() : _obstacleManager(nullptr) {}
     void update(double dt) override;
+    void reset() override;
+
     void render() override;
     void load() override;
-    void pauseSounds();
 };
 
-class PauseScene : public Scene {
+
+// Forward declaration of PauseScene class
+class PauseScene final : public Scene {
 protected:
-    sf::Font font;
+    Font font;
     std::vector<std::shared_ptr<Entity>> _menuItems;
 
 public:
@@ -58,11 +61,45 @@ public:
     void render() override;
 };
 
-class GameOverScene : public Scene {
+// Forward declaration of GameOverScene class
+class GameOverScene final : public Scene {
 private:
-    sf::Font font;
-    sf::Text gameOverText;
-    sf::Text promptText;
+    Font font;
+    Text gameOverText;
+    Text gameOverScoreText;
+    Text promptText;
+    gameUIManager _gameUIManager;
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+};
+
+
+// Forward declaration of KeyBindScene class
+class KeyBindScene final : public Scene {
+private:
+    Font font;
+    Text titleText;
+    Text leftKeyText;
+    Text rightKeyText;
+    Text promptText;
+
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+};
+
+
+// Forward declaration of ChangeCarScene class
+class ChangeCarScene final : public Scene {
+private:
+    Font font;
+    Text titleText;
+    std::vector<std::pair<Text, std::string>> carOptions;
+    size_t selectedOption = 0;
+
 public:
     void load() override;
     void update(double dt) override;

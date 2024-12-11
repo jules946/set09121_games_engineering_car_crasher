@@ -11,47 +11,44 @@
 #include "system_renderer.h"
 #include "background_manager.h"
 #include "cmp_hit_box.h"
+#include "cmp_key_binds.h"
 #include "obstacle_manager.h"
 #include "game_UI_Manager.h"
 #include "cmp_menu.h"
 #include "cmp_police_ai_movement.h"
 
 
-// TODO
-// Obstacle Manager -- Alessio
-//- add good obstacles e.g. heart
-//- if car drives over heart ++lives
-
-//Main Menu -- Alessio
-//- Add text to let player know to click a button to start game - Done
-//- Add car change functionality
-//- Add keybind functionality
-//- Add difficulity functionality
-//- Add pause menu to gameScene - Done
-
-
 using namespace sf;
 using namespace std;
 
+int score;
+bool isHardDifficulty = false;
 
-// MenuScene class implementation
+std::unique_ptr<KeyBindComponent> keyBindComponent;
+
+// Default car selection to Blue Car
+std::string selectedCar = "Blue Car";
+
+// Map to hold different car res paths
+const std::map<std::string, std::string> CAR_CONFIGS = {
+    std::make_pair("Blue Car", "res/img/BlueCar.png"),
+    std::make_pair("Grey Car", "res/img/Car_Grey.png"),
+    std::make_pair("Red Car", "res/img/Car_Red.png"),
+    std::make_pair("Striped Car", "res/img/Car_Striped.png")
+};
+
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
     }
 
-    // Debug before creating component
-    std::cout << "Before component creation - gameScene: " << gameScene << std::endl;
-
     // Create menu controller entity
-    auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::MAIN);
-    // Debug after
-    std::cout << "After component creation - gameScene: " << gameScene << std::endl;
+    const auto menuEntity = std::make_shared<Entity>();
+    const auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::MAIN);
 
     // Create title
-    auto title = std::make_shared<Entity>();
-    auto titleText = title->addComponent<TextComponent>("Car Crasher");
+    const auto title = std::make_shared<Entity>();
+    const auto titleText = title->addComponent<TextComponent>("Car Crasher");
     titleText->setCharacterSize(48);
     title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
     titleText->centerOrigin();
@@ -61,13 +58,15 @@ void MenuScene::load() {
     std::vector<std::string> options = {
         "Play Game",
         "Choose Different Car",
-        "Difficulty",
-        "Key Binds"
+        "Difficulty: " + std::string(isHardDifficulty ? "Hard" : "Easy"),
+        "Key Binds",
+        "Quit Game"
     };
 
     _entity_manager.list.push_back(menuEntity);
     _entity_manager.list.push_back(title);
 
+    // Add menu items
     float yPos = gameHeight / 2.f;
     for (const auto& opt : options) {
         auto item = std::make_shared<Entity>();
@@ -95,6 +94,7 @@ void MenuScene::load() {
 }
 
 
+
 void MenuScene::update(const double dt) {
     // Blink the prompt text every 0.8 seconds
     if (blinkClock.getElapsedTime().asSeconds() > 0.8f) {
@@ -115,19 +115,20 @@ void MenuScene::render() {
 
 // GameScene class implementation
 void GameScene::load() {
-    // add background
+    score = 0;
+    // Add road background
     _backgroundManager.loadBackground(_entity_manager);
 
     // Initialize obstacle manager
     _obstacleManager = std::make_unique<ObstacleManager>(_entity_manager);
-    _obstacleManager->initializeSprites(); // Single function call to add all sprites
+    _obstacleManager->initializeSprites();
 
     // Create player
     _player = make_shared<Entity>();
 
-    // Add sprite component to player
+    // Add Sprite
     const auto s = _player->addComponent<SpriteComponent>();
-    s->setTexture("res/img/BlueCar.png");
+    s->setTexture(CAR_CONFIGS.at(selectedCar));
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
@@ -142,10 +143,10 @@ void GameScene::load() {
 
     _entity_manager.list.push_back(_player);
 
-    // TODO maybe make part of the gameScene class?
     // Create cop car
     _cop = make_shared<Entity>();
 
+    // Add sprite component
     const auto copSprite = _cop->addComponent<SpriteComponent>();
     copSprite->setTexture("res/img/police_car.png");
     copSprite->getSprite().setScale(2.0f, 2.0f);
@@ -154,37 +155,35 @@ void GameScene::load() {
 
     _cop->setPosition(Vector2f(lanePositions[2], gameHeight + 100.f)); // Start below screen
 
-    // Add hitbox component
+    // Add hit-box component
     _cop->addComponent<HitboxComponent>(FloatRect(0, 0,
         copSprite->getSprite().getLocalBounds().width,
         copSprite->getSprite().getLocalBounds().height));
 
-    // Add pursuit component with required parameters
+    // Add pursuit component
     _cop->addComponent<PolicePursuitComponent>(lanePositions, _player, &_entity_manager);
     _cop->addComponent<SoundEffectComponent>("res/sound/police_siren.wav");
 
     _entity_manager.list.push_back(_cop);
 
-
-    // UI for lives etc
+    // Setup game Manager
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
-    }
-    livesText.setFont(font); // Set the font of the text
-    livesText.setCharacterSize(24); // Set the character size
-    livesText.setFillColor(sf::Color::White); // Set the text color
-    livesText.setString("Lives:");
-    // Get text bounds
-    const FloatRect bounds = livesText.getLocalBounds();
-
-    // Ensuring the text's origin and position are aligned to whole pixels to avoid subpixel
-    // rendering and prevent blurriness
-    livesText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
-    livesText.setPosition(gameWidth - 270.f, 40.f);
+    } // probably should define once at start of this file
+    _gameUIManager.loadFont(font);
+    _gameUIManager.setupTexts(scoreText, livesText, pauseText);
     _gameUIManager.loadLives(_entity_manager, livesInt);
 }
 
 void GameScene::update(const double dt) {
+    // Check if player has lost all lives i.e. game over
+    if (livesInt <= 0 && activeScene != gameOverScene) {
+        stopSounds();
+        std::cout << "Debug: Score before switching to game over scene: " << score << std::endl;
+        activeScene = gameOverScene;
+    }
+
+    // start siren sound on first update
     if (_firstUpdate) {
         const auto siren = _cop->getComponent<SoundEffectComponent>();
         if (siren) {
@@ -192,11 +191,12 @@ void GameScene::update(const double dt) {
         }
         _firstUpdate = false;
     }
-    // std::cout << "Game scene update" << std::endl;
+    // Pause the game if Tab pressed
     if (Keyboard::isKeyPressed(Keyboard::Tab)) {
-        activeScene = menuScene;
+        stopSounds();
+        activeScene = pauseScene;
     }
-
+    
     // Update collision manager
     CollisionManager::checkPlayerCollisions(_entity_manager, _player, _cop);
 
@@ -204,36 +204,31 @@ void GameScene::update(const double dt) {
     if (_obstacleManager) {
         _obstacleManager->update(dt);
     }
-    
-    _gameUIManager.update(dt, _entity_manager, livesInt);
+  
+    // Update game ui manager
+    _gameUIManager.update(dt, _entity_manager, scoreText);
 
-    if (livesInt <= 0 && activeScene != gameOverScene) {
-        pauseSounds();
-        activeScene = gameOverScene;
-    }
-
+    // Update the scene (calls entity manager to update everything)
     Scene::update(dt);
+}
+
+// Reset for a new game
+void GameScene::reset() {
+    livesInt = 3;
+    score = 0;
+    _firstUpdate = true;
+    _entity_manager.list.clear();
+    load();
 }
 
 // Add all entities to the renderer queue
 void GameScene::render() {
-    Renderer::queue(&livesText);
     Scene::render();
+    Renderer::queue(&livesText);
+    Renderer::queue(&scoreText);
+    Renderer::queue(&pauseText);
 }
 
-
-// Created to stop the screeching sound while the game is paused
-void GameScene::pauseSounds() {
-    if (auto sound = _player->getComponent<SoundEffectComponent>()) {
-        sound->stopSound();
-    }
-
-    for (auto& entity : _entity_manager.list) {
-        if (auto sound = entity->getComponent<SoundEffectComponent>()) {
-            sound->stopSound();
-        }
-    }
-}
 
 void PauseScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
@@ -241,8 +236,8 @@ void PauseScene::load() {
     }
 
     // Create pause title
-    auto title = std::make_shared<Entity>();
-    auto titleText = title->addComponent<TextComponent>("Game Paused");
+    const auto title = std::make_shared<Entity>();
+    const auto titleText = title->addComponent<TextComponent>("Game Paused");
     titleText->setCharacterSize(48);
     title->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 3.f));
     titleText->centerOrigin();
@@ -253,6 +248,7 @@ void PauseScene::load() {
     questionText->setCharacterSize(32);
     question->setPosition(Vector2f(gameWidth / 2.f, gameHeight / 2.f));
     questionText->centerOrigin();
+
     // Create menu options
     std::vector<std::string> options = {
         "Yes, please",
@@ -260,12 +256,13 @@ void PauseScene::load() {
     };
 
     float yPos = gameHeight / 1.5f;
-    auto menuEntity = std::make_shared<Entity>();
-    auto menuControl = menuEntity->addComponent<MenuComponent>(activeScene, gameScene, MenuComponent::MenuType::PAUSE);
+    const auto menuEntity = std::make_shared<Entity>();
+    const auto menuControl = menuEntity->addComponent<MenuComponent>(MenuComponent::MenuType::PAUSE);
 
+    // Add menu items
     for (const auto& opt : options) {
         auto item = std::make_shared<Entity>();
-        auto text = item->addComponent<TextComponent>(opt);
+        const auto text = item->addComponent<TextComponent>(opt);
         text->setCharacterSize(32);
         item->setPosition(Vector2f(gameWidth / 2.f, yPos));
         text->centerOrigin();
@@ -274,12 +271,13 @@ void PauseScene::load() {
         yPos += 60.f;
     }
 
+    // Add all entities to the entity manager
     _entity_manager.list.push_back(title);
     _entity_manager.list.push_back(question);
     _entity_manager.list.push_back(menuEntity);
 }
 
-void PauseScene::update(double dt) {
+void PauseScene::update(const double dt) {
     Scene::update(dt);
 }
 
@@ -293,28 +291,16 @@ void GameOverScene::load() {
         throw std::runtime_error("Failed to load font!");
     }
 
-    gameOverText.setFont(font);
-    gameOverText.setString("Game Over");
-    gameOverText.setCharacterSize(48);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setPosition(gameWidth / 2.f, gameHeight / 3.f);
-    gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2.f,
-                          gameOverText.getLocalBounds().height / 2.f);
-
-    promptText.setFont(font);
-    promptText.setString("Press Enter to go to the Main Menu");
-    promptText.setCharacterSize(24);
-    promptText.setFillColor(sf::Color::White);
-    promptText.setPosition(gameWidth / 2.f, gameHeight / 2.f);
-    promptText.setOrigin(promptText.getLocalBounds().width / 2.f,
-                        promptText.getLocalBounds().height / 2.f);
+    // Create game over text
+    _gameUIManager.loadFont(font);
+    _gameUIManager.setupGameOverTexts(gameOverText, gameOverScoreText, promptText);
 }
 
-void GameOverScene::update(double dt) {
+void GameOverScene::update(const double dt) {
+    gameUIManager::updateGameOverScore(gameOverScoreText);
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-        livesInt = 3;  // Reset lives
-        gameScene = std::make_shared<GameScene>();
-        gameScene->load();
+        gameScene->reset();
         activeScene = menuScene;
     }
     Scene::update(dt);
@@ -322,6 +308,121 @@ void GameOverScene::update(double dt) {
 
 void GameOverScene::render() {
     Renderer::queue(&gameOverText);
+    Renderer::queue(&gameOverScoreText);
     Renderer::queue(&promptText);
     Scene::render();
+}
+
+void KeyBindScene::load() {
+    // Create the KeyBindComponent instance
+    const auto entity = makeEntity();
+    keyBindComponent = std::make_unique<KeyBindComponent>(entity.get());
+}
+
+void KeyBindScene::update(const double dt) {
+    // Update the KeyBindComponent
+    keyBindComponent->update(dt);
+
+    // Handle scene navigation (return to menu)
+    if (Keyboard::isKeyPressed(Keyboard::BackSpace)) {
+        activeScene = menuScene;
+    }
+
+    Scene::update(dt);
+}
+
+void KeyBindScene::render() {
+    // Render the KeyBindComponent
+    keyBindComponent->render();
+
+    Scene::render();
+}
+
+void ChangeCarScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    // Create title text
+    titleText.setFont(font);
+    titleText.setString("Choose Your Car");
+    titleText.setCharacterSize(48);
+    titleText.setOrigin(std::round(titleText.getLocalBounds().width / 2.f), std::round(titleText.getLocalBounds().height / 2.f));
+    titleText.setPosition(std::round(gameWidth / 2.f), std::round(gameHeight / 4.f));
+    carOptions.clear();
+    float yPos = gameHeight / 2.f;
+
+    // Create menu items from CAR_CONFIGS
+    for (const auto& carConfig : CAR_CONFIGS) {
+        const std::string& carName = carConfig.first;
+        const std::string& spritePath = carConfig.second;
+
+        sf::Text text;
+        text.setFont(font);
+        text.setString(carName);
+        text.setCharacterSize(32);
+        text.setOrigin(std::round(text.getLocalBounds().width / 2.f), std::round(text.getLocalBounds().height / 2.f));
+        text.setPosition(std::round(gameWidth / 2.f), std::round(yPos));
+        carOptions.emplace_back(text, spritePath);
+        yPos += 60.f;
+    }
+
+    // Set initial selected option based on current selectedCar
+    selectedOption = 0;
+    int index = 0;
+    for (const auto& carConfig : CAR_CONFIGS) {
+        const std::string& carName = carConfig.first;
+        if (carName == selectedCar) {
+            selectedOption = index;
+            break;
+        }
+        index++;
+    }
+}
+
+void ChangeCarScene::update(double dt) {
+    static bool upPressed = false;
+    static bool downPressed = false;
+    static bool returnPressed = false;
+    static sf::Clock inputDelay;
+
+    // Handle input for changing car selection
+    if (inputDelay.getElapsedTime().asSeconds() > 0.15f) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !upPressed) {
+            selectedOption = (selectedOption - 1 + carOptions.size()) % carOptions.size();
+            upPressed = true;
+            inputDelay.restart();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !downPressed) {
+            selectedOption = (selectedOption + 1) % carOptions.size();
+            downPressed = true;
+            inputDelay.restart();
+        }
+    }
+
+    if (!Keyboard::isKeyPressed(Keyboard::Up)) upPressed = false;
+    if (!Keyboard::isKeyPressed(Keyboard::Down)) downPressed = false;
+
+    if (Keyboard::isKeyPressed(Keyboard::Return) && !returnPressed) {
+        // Convert selectedOption index to car name using the options vector
+        auto it = CAR_CONFIGS.begin();
+        std::advance(it, selectedOption);
+        // Update selectedCar based on choice
+        selectedCar = it->first;
+
+        activeScene = menuScene;
+        returnPressed = true;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::Return)) returnPressed = false;
+
+    Scene::update(dt);
+}
+
+
+void ChangeCarScene::render() {
+    Renderer::queue(&titleText);
+    for (size_t i = 0; i < carOptions.size(); ++i) {
+        carOptions[i].first.setFillColor(i == selectedOption ? sf::Color::Yellow : sf::Color::White);
+        Renderer::queue(&carOptions[i].first);
+    }
 }

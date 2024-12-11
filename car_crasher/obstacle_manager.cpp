@@ -1,15 +1,21 @@
-//obstacle_manager.cpp
+// obstacle_manager.cpp
 #include "obstacle_manager.h"
-#include "cmp_actor_movement.h"
+
+#include <limits>
+
 #include "cmp_sprite.h"
-#include "game_config.h"
+#include "cmp_actor_movement.h"
 #include "cmp_hit_box.h"
+
+
 
 ObstacleManager::ObstacleManager(EntityManager& entityManager)
     : _entityManager(entityManager),
-      _spawnInterval(2.0f) {
+      _spawnInterval(isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL),
+      lastObstacleYPos{-100.0f, -100.0f, -100.0f, -100.0f} {
     _spawnClock.restart();
 }
+
 
 void ObstacleManager::addObstacleSprite(const std::string& spritePath) {
     _obstacleSprites.push_back(spritePath);
@@ -26,45 +32,58 @@ void ObstacleManager::initializeSprites() {
     addObstacleSprite("res/img/School_bus.png");
     addObstacleSprite("res/img/Van_rundown.png");
     // Good obstacles
-    addObstacleSprite("res/img/heartLife.png");  // Add heart to sprites
+    addObstacleSprite("res/img/heartLife.png");
 }
 
-const std::string& ObstacleManager::getRandomSprite() const {
-    static const std::string heartSprite = "res/img/heartLife.png";
-    if (rand() % 10 == 0) {  // 10% chance for heart
-        return heartSprite;
-    }
-    return _obstacleSprites[rand() % _obstacleSprites.size()];
-}
+int ObstacleManager::findBestLane() const {
+    float minY = std::numeric_limits<float>::infinity();
+    int bestLane = 0;
 
-
-void ObstacleManager::update(double dt) {
-
-    // Debug print to check spawn timing
-    // std::cout << "Time since last spawn: " << _spawnClock.getElapsedTime().asSeconds() << std::endl;
-
-    if (_spawnClock.getElapsedTime().asSeconds() > _spawnInterval) {
-        if (auto obstacle = createObstacle()) {
-            std::cout << "Created new obstacle" << std::endl;
-            _entityManager.list.push_back(obstacle);
-        } else {
-            std::cout << "Failed to create obstacle" << std::endl;
+    // Find the lane with the most space
+    for (int lane = 0; lane < numLanes; ++lane) {
+        const float spaceInLane = lastObstacleYPos[lane];
+        if (spaceInLane < minY) {
+            minY = spaceInLane;
+            bestLane = lane;
         }
-        _spawnClock.restart();
+    }
+
+    return bestLane;
+}
+
+// Update the last obstacle position per lane
+void ObstacleManager::updateLaneTracking() {
+    for (int i = 0; i < numLanes; ++i) {
+        lastObstacleYPos[i] = -100.0f;
+    }
+
+    // Update with current obstacle positions
+    for (const auto& entity : _entityManager.list) {
+        if (const auto movement = entity->getComponent<ObstacleMovementComponent>()) {
+            const int lane = movement->getLane();
+            float yPos = entity->getPosition().y;
+            lastObstacleYPos[lane] = std::max(lastObstacleYPos[lane], yPos);
+        }
     }
 }
 
 std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     if (_obstacleSprites.empty()) return nullptr;
 
+    updateLaneTracking();
+
     auto obstacle = std::make_shared<Entity>();
-    auto sprite = obstacle->addComponent<SpriteComponent>();
-    std::string spritePath = getRandomSprite();
+    const auto sprite = obstacle->addComponent<SpriteComponent>();
+    const std::string spritePath = getRandomSprite();
     sprite->setTexture(spritePath);
 
+    // Determine the type of obstacle
+    const bool isCarObstacle = (spritePath == "res/img/Taxi.png" ||
+                                spritePath == "res/img/Truck.png" ||
+                                spritePath == "res/img/School_bus.png" ||
+                                spritePath == "res/img/Van_rundown.png");
 
     // Set scale based on sprite type
-    // Different scale for heart
     if (spritePath == "res/img/heartLife.png") {
         _isGoodObstacle = true;
         sprite->getSprite().setScale(0.1f, 0.1f);
@@ -73,36 +92,70 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
         sprite->getSprite().setScale(2.0f, 2.0f);
     }
 
+    // Set origin to center
     sprite->getSprite().setOrigin(
         sprite->getSprite().getLocalBounds().width / 2.f,
         sprite->getSprite().getLocalBounds().height / 2.f
     );
 
+    // Set speed based on obstacle type
+    const int bestLane = findBestLane();
+    const float carObstacleSpeedPercentage = 0.5f;
+    const float obstacleSpeed = isCarObstacle
+                                    ? baseSpeed * carObstacleSpeedPercentage  // Car obstacles are slower
+                                    : baseSpeed;                              // Non-car obstacles use baseSpeed
+
     // Add movement component
-    auto movement = obstacle->addComponent<ObstacleMovementComponent>();
+    auto movement = obstacle->addComponent<ObstacleMovementComponent>(bestLane, obstacleSpeed);
+    obstacle->setPosition(sf::Vector2f(lanePositions[bestLane], -50.f));
 
-    // Set initial position using game_config lane positions
-    int lane = movement->getLane();
-    obstacle->setPosition(sf::Vector2f(lanePositions[lane], -50.f));
-
-
-    if (spritePath == "res/img/heartLife.png") {
-        sprite->getSprite().setScale(0.1f, 0.1f);
+    // Add hit-box
+    if (_isGoodObstacle) {
         const auto scaledBounds = sprite->getSprite().getGlobalBounds();
         obstacle->addComponent<HitboxComponent>(sf::FloatRect(
-            scaledBounds.left,
-            scaledBounds.top,
-            scaledBounds.width * 0.1f,  // Match sprite scale
-            scaledBounds.height * 0.1f
+            scaledBounds.left, scaledBounds.top,
+            scaledBounds.width * 0.1f, scaledBounds.height * 0.1f
         ));
     } else {
-        sprite->getSprite().setScale(2.0f, 2.0f);
-        const auto scaledBounds = sprite->getSprite().getGlobalBounds();
-        //TODO: Figure out why the hitbox is not matching the sprite perfectly
         obstacle->addComponent<HitboxComponent>(sf::FloatRect(0, 0,
-        sprite->getSprite().getLocalBounds().width,
-        sprite->getSprite().getLocalBounds().height));
+            sprite->getSprite().getLocalBounds().width,
+            sprite->getSprite().getLocalBounds().height));
     }
-    return obstacle;
 
+    return obstacle;
+}
+
+void ObstacleManager::update(double dt) {
+    _spawnInterval = isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL;
+
+    if (_spawnClock.getElapsedTime().asSeconds() > _spawnInterval) {
+        if (const auto obstacle = createObstacle()) {
+            _entityManager.list.push_back(obstacle);
+        }
+        _spawnClock.restart();
+    }
+
+    // Cleanup obstacles that are off-screen
+    _entityManager.list.erase(
+        std::remove_if(
+            _entityManager.list.begin(),
+            _entityManager.list.end(),
+            [](const std::shared_ptr<Entity>& entity) {
+                return entity->is_fordeletion();
+            }
+        ),
+        _entityManager.list.end()
+    );
+}
+
+const std::string& ObstacleManager::getRandomSprite() const {
+    static const std::string heartSprite = "res/img/heartLife.png";
+
+    // Only spawn heart if player has less than max lives and 10% chance
+    if (livesInt < 3 && rand() % 10 == 0) {
+        return heartSprite;
+    }
+
+    // Get random sprite excluding the heart (last sprite)
+    return _obstacleSprites[rand() % (_obstacleSprites.size() - 1)];
 }
