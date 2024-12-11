@@ -6,19 +6,24 @@ using namespace sf;
 
 void ActorMovementComponent::update(double dt) {}
 
+// ActorMovementComponent constructor
 ActorMovementComponent::ActorMovementComponent(Entity* p)
     : Component(p), _speed(100.0f) {}
 
-ObstacleMovementComponent::ObstacleMovementComponent(Entity* p, int bestLane, float speed)
+// ObstacleMovementComponent constructor
+ObstacleMovementComponent::ObstacleMovementComponent(Entity* p, const int bestLane, const float speed)
     : ActorMovementComponent(p), _lane(bestLane) {
     const float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
     setSpeed(speed * speedMultiplier);
 }
 
-void ObstacleMovementComponent::update(double dt) {
+//
+void ObstacleMovementComponent::update(const double dt) {
+    // Move the obstacle down the screen
     _parent->setPosition(sf::Vector2f(lanePositions[_lane],
                                     _parent->getPosition().y + getSpeed() * dt));
 
+    // If the obstacle is off the screen, mark it for deletion
     if (_parent->getPosition().y > gameHeight) {
         _parent->setForDelete();
     }

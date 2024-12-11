@@ -10,9 +10,9 @@ using namespace sf;
 
 class gameUIManager {
 private:
-    sf::Texture livesTexture; // Store texture persistently
-    sf::Font _font;
-    sf::Text pauseText;
+    Texture livesTexture; // Store texture persistently
+    Font _font;
+    Text pauseText;
 
 public:
     void loadFont(const Font& font);

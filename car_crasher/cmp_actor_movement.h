@@ -1,6 +1,7 @@
 //"cmp_actor_movement.h"
 #pragma once
 #include <ecm.h>
+
 class ActorMovementComponent : public Component {
 protected:
     float _speed;

@@ -6,6 +6,7 @@
 #include <cmath>
 #include "cmp_sound_effect.h"
 
+// Constructor
 PlayerMovementComponent::PlayerMovementComponent(Entity* p, const std::array<float, 4>& lanePositions,
                                                float moveSpeed, float tiltAngle)
     : ActorMovementComponent(p), _lanePositions(lanePositions),
@@ -21,6 +22,7 @@ void PlayerMovementComponent::update(const double dt) {
         _soundEffect = _parent->getComponent<SoundEffectComponent>();
     }
 
+    // Move left
     if (sf::Keyboard::isKeyPressed(KeyBindComponent::getLeftKey()) && _currentLane > 0 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
         _currentLane--;
@@ -30,6 +32,7 @@ void PlayerMovementComponent::update(const double dt) {
         }
         }
 
+    // Move right
     if (sf::Keyboard::isKeyPressed(KeyBindComponent::getRightKey()) && _currentLane < numLanes - 1 &&
         std::abs(_parent->getPosition().x - _targetX) < 1.0f) {
         _currentLane++;
@@ -39,11 +42,14 @@ void PlayerMovementComponent::update(const double dt) {
         }
         }
 
+    // Move towards the target X position defined by centre of lane
     if (std::abs(_targetX - _parent->getPosition().x) > 1.0f) {
+        // Calculate the distance to move this frame
         const auto moveDistance = static_cast<float>((_targetX - _parent->getPosition().x) * _moveSpeed * dt);
 
         move(moveDistance, 0.0f);
 
+        // Tilt the car in the direction of movement
         const float tilt = (_targetX > _parent->getPosition().x) ? _tiltAngle : -_tiltAngle;
         _parent->getComponent<SpriteComponent>()->getSprite().setRotation(tilt);
     } else {

@@ -7,6 +7,7 @@ using namespace std;
 using namespace sf;
 
 void EntityManager::removeDeletedEntities() {
+    // Remove entities that are marked for deletion
     list.erase(std::remove_if(list.begin(), list.end(),
                               [](const std::shared_ptr<Entity>& entity) { return entity->is_fordeletion(); }),
                list.end());

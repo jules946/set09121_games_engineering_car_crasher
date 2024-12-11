@@ -3,6 +3,7 @@
 #include "cmp_sprite.h"
 #include "system_renderer.h"
 
+// Constructor
 SpriteComponent::SpriteComponent(Entity *p)
     : Component(p), _sprite(std::make_shared<sf::Sprite>()) {}
 

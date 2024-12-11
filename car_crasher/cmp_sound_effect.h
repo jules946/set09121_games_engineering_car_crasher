@@ -4,7 +4,7 @@
 #include "ecm.h"
 #include <SFML/Audio.hpp>
 
-class SoundEffectComponent : public Component {
+class SoundEffectComponent final : public Component {
 private:
     sf::SoundBuffer _soundBuffer;
     sf::Sound _sound;

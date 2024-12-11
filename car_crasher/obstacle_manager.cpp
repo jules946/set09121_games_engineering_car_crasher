@@ -8,6 +8,7 @@
 #include "cmp_hit_box.h"
 
 
+
 ObstacleManager::ObstacleManager(EntityManager& entityManager)
     : _entityManager(entityManager),
       _spawnInterval(isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL),
@@ -31,45 +32,37 @@ void ObstacleManager::initializeSprites() {
     addObstacleSprite("res/img/School_bus.png");
     addObstacleSprite("res/img/Van_rundown.png");
     // Good obstacles
-    addObstacleSprite("res/img/heartLife.png");  // Add heart to sprites
+    addObstacleSprite("res/img/heartLife.png");
 }
 
 int ObstacleManager::findBestLane() const {
-    float minY = std::numeric_limits<float>::infinity();  // Changed from max to min
+    float minY = std::numeric_limits<float>::infinity();
     int bestLane = 0;
 
-    // Debug output
-    std::cout << "Lane positions: ";
+    // Find the lane with the most space
     for (int lane = 0; lane < numLanes; ++lane) {
-        std::cout << lastObstacleYPos[lane] << " ";
-    }
-    std::cout << std::endl;
-
-    for (int lane = 0; lane < numLanes; ++lane) {
-        float spaceInLane = lastObstacleYPos[lane];
-        if (spaceInLane < minY) {  // Changed from > to
+        const float spaceInLane = lastObstacleYPos[lane];
+        if (spaceInLane < minY) {
             minY = spaceInLane;
             bestLane = lane;
         }
     }
 
-    std::cout << "Selected lane: " << bestLane << " with Y: " << minY << std::endl;
     return bestLane;
 }
 
+// Update the last obstacle position per lane
 void ObstacleManager::updateLaneTracking() {
-    // Reset tracking
     for (int i = 0; i < numLanes; ++i) {
         lastObstacleYPos[i] = -100.0f;
     }
 
     // Update with current obstacle positions
     for (const auto& entity : _entityManager.list) {
-        if (auto movement = entity->getComponent<ObstacleMovementComponent>()) {
-            int lane = movement->getLane();
+        if (const auto movement = entity->getComponent<ObstacleMovementComponent>()) {
+            const int lane = movement->getLane();
             float yPos = entity->getPosition().y;
             lastObstacleYPos[lane] = std::max(lastObstacleYPos[lane], yPos);
-            std::cout << "Updating lane " << lane << " with Y: " << yPos << std::endl;
         }
     }
 }
@@ -80,15 +73,15 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
     updateLaneTracking();
 
     auto obstacle = std::make_shared<Entity>();
-    auto sprite = obstacle->addComponent<SpriteComponent>();
-    std::string spritePath = getRandomSprite();
+    const auto sprite = obstacle->addComponent<SpriteComponent>();
+    const std::string spritePath = getRandomSprite();
     sprite->setTexture(spritePath);
 
     // Determine the type of obstacle
-    bool isCarObstacle = (spritePath == "res/img/Taxi.png" ||
-                          spritePath == "res/img/Truck.png" ||
-                          spritePath == "res/img/School_bus.png" ||
-                          spritePath == "res/img/Van_rundown.png");
+    const bool isCarObstacle = (spritePath == "res/img/Taxi.png" ||
+                                spritePath == "res/img/Truck.png" ||
+                                spritePath == "res/img/School_bus.png" ||
+                                spritePath == "res/img/Van_rundown.png");
 
     // Set scale based on sprite type
     if (spritePath == "res/img/heartLife.png") {
@@ -99,21 +92,24 @@ std::shared_ptr<Entity> ObstacleManager::createObstacle() {
         sprite->getSprite().setScale(2.0f, 2.0f);
     }
 
+    // Set origin to center
     sprite->getSprite().setOrigin(
         sprite->getSprite().getLocalBounds().width / 2.f,
         sprite->getSprite().getLocalBounds().height / 2.f
     );
 
+    // Set speed based on obstacle type
     const int bestLane = findBestLane();
-    float carObstacleSpeedPercentage = 0.5f;
-    float obstacleSpeed = isCarObstacle
-                              ? baseSpeed * carObstacleSpeedPercentage  // Car obstacles are slower
-                              : baseSpeed;                              // Non-car obstacles use baseSpeed
+    const float carObstacleSpeedPercentage = 0.5f;
+    const float obstacleSpeed = isCarObstacle
+                                    ? baseSpeed * carObstacleSpeedPercentage  // Car obstacles are slower
+                                    : baseSpeed;                              // Non-car obstacles use baseSpeed
 
+    // Add movement component
     auto movement = obstacle->addComponent<ObstacleMovementComponent>(bestLane, obstacleSpeed);
     obstacle->setPosition(sf::Vector2f(lanePositions[bestLane], -50.f));
 
-    // Add hitbox
+    // Add hit-box
     if (_isGoodObstacle) {
         const auto scaledBounds = sprite->getSprite().getGlobalBounds();
         obstacle->addComponent<HitboxComponent>(sf::FloatRect(
@@ -133,11 +129,8 @@ void ObstacleManager::update(double dt) {
     _spawnInterval = isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL;
 
     if (_spawnClock.getElapsedTime().asSeconds() > _spawnInterval) {
-        if (auto obstacle = createObstacle()) {
-            // std::cout << "Created new obstacle" << std::endl;
+        if (const auto obstacle = createObstacle()) {
             _entityManager.list.push_back(obstacle);
-        } else {
-            // std::cout << "Failed to create obstacle" << std::endl;
         }
         _spawnClock.restart();
     }

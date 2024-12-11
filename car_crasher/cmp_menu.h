@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class TextComponent : public Component {
+class TextComponent final : public Component {
 protected:
     std::shared_ptr<sf::Font> _font;
     sf::Text _text;
@@ -22,8 +22,8 @@ public:
     void centerOrigin();
 };
 
-class MenuComponent : public Component {
-public:  // Move enums to public section
+class MenuComponent final : public Component {
+public:
     enum class MenuState { TITLE, MAIN_MENU, PAUSE_MENU };
     enum class MenuType { MAIN, PAUSE };
 

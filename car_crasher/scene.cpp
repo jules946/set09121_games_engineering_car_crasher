@@ -18,7 +18,6 @@ std::vector<std::shared_ptr<Entity>>& Scene::getEnts() {
 }
 
 // Load all entities in the scene
-// Will be overridden per scene
 void Scene::load() {}
 
 void Scene::reset() {}
@@ -29,6 +28,7 @@ void Scene::update(const double dt) { _entity_manager.update(dt); }
 // Render all entities in the scene
 void Scene::render() { _entity_manager.render(); }
 
+// Stop all sounds in the scene
 void Scene::stopSounds() const {
     for (auto& entity : _entity_manager.list) {
         if (const auto sound = entity->getComponent<SoundEffectComponent>()) {
@@ -36,6 +36,8 @@ void Scene::stopSounds() const {
         }
     }
 }
+
+// Resume all sounds in the scene
 void Scene::resumeSounds() const {
     for (auto& entity : _entity_manager.list) {
         if (const auto sound = entity->getComponent<SoundEffectComponent>()) {

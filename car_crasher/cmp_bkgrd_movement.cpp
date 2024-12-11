@@ -5,13 +5,14 @@
 
 
 // Constructor
-BackgroundMovementComponent::BackgroundMovementComponent(Entity* p, float tileHeight)
+BackgroundMovementComponent::BackgroundMovementComponent(Entity* p, const float tileHeight)
     : ActorMovementComponent(p), _screenHeight(gameHeight), _tileHeight(tileHeight) {
+    // Set speed based on difficulty
     const float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
     setSpeed(baseSpeed * speedMultiplier);
 }
 
-// Update method
+// Update background position
 void BackgroundMovementComponent::update(double dt) {
     // Get current position
     auto pos = _parent->getPosition();
@@ -20,9 +21,7 @@ void BackgroundMovementComponent::update(double dt) {
     pos.y += getSpeed() * static_cast<float>(dt);
 
     // Wrap around when off screen
-    // Add a small buffer to ensure smooth transition
     if (pos.y >= _screenHeight) {
-        // Calculate exact position to maintain seamless scrolling
         pos.y = -_tileHeight + (pos.y - _screenHeight);
     }
 

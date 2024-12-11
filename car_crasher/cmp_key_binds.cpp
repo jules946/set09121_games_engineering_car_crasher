@@ -9,6 +9,7 @@
 sf::Keyboard::Key KeyBindComponent::_leftKey = sf::Keyboard::Left;
 sf::Keyboard::Key KeyBindComponent::_rightKey = sf::Keyboard::Right;
 
+// Map of sf::Keyboard::Key to string
 std::map<sf::Keyboard::Key, std::string> keyToStringMap = {
     {sf::Keyboard::A, "A"},
     {sf::Keyboard::B, "B"},
@@ -111,15 +112,15 @@ std::map<sf::Keyboard::Key, std::string> keyToStringMap = {
 };
 
 
-// Define keyToString as a member of KeyBindComponent
-std::string KeyBindComponent::keyToString(sf::Keyboard::Key key) {
+// Convert sf::Keyboard::Key to string
+std::string KeyBindComponent::keyToString(const sf::Keyboard::Key key) {
     if (keyToStringMap.count(key) > 0) {
         return keyToStringMap[key];
-    } else {
-        return "Unknown";
     }
+    return "Unknown";
 }
 
+// Constructor
 KeyBindComponent::KeyBindComponent(Entity* p) : Component(p) {
     if (!_font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
         throw std::runtime_error("Failed to load font!");
@@ -165,12 +166,13 @@ void KeyBindComponent::update(double dt) {
     static bool downPressed = false;
     static bool enterPressed = false;
 
+    // Return to menu if ESC is pressed
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
         activeScene = menuScene;
         return;
     }
 
-    // Navigation logic (independent of waitingForKey)
+    // Navigation logic
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
         if (!upPressed) {
             upPressed = true;
@@ -190,7 +192,6 @@ void KeyBindComponent::update(double dt) {
     }
 
     // Handle waiting for key input
-
     if (waitingForKey) {
         for (int k = 0; k < sf::Keyboard::KeyCount; ++k) {
             auto key = static_cast<sf::Keyboard::Key>(k);
@@ -205,7 +206,7 @@ void KeyBindComponent::update(double dt) {
                     _rightKey = key;
                     _rightKeyText.setString("Right Key: " + keyToString(_rightKey));
                 }
-                waitingForKey = false; // Exit waiting state
+                waitingForKey = false;
                 break;
             }
         }

@@ -11,21 +11,17 @@ using namespace sf;
 using namespace std;
 
 void Load() {
+    // Load resources and initialize scenes
     gameScene = std::make_shared<GameScene>();
-    std::cout << "GameScene created: " << gameScene << std::endl;
-
     menuScene = std::make_shared<MenuScene>();
-
-    gameScene->load();
-    std::cout << "GameScene loaded: " << gameScene << std::endl;
-
     pauseScene = std::make_shared<PauseScene>();
     gameOverScene = std::make_shared<GameOverScene>();
     keyBindScene = std::make_shared<KeyBindScene>();
     changeCarScene = std::make_shared<ChangeCarScene>();
-    pauseScene->load();
 
+    gameScene->load();
     menuScene->load();
+    pauseScene->load();
     gameOverScene->load();
     keyBindScene->load();
     changeCarScene->load();
@@ -51,6 +47,7 @@ void Render() {
 
 int main() {
     RenderWindow window(VideoMode(gameWidth, gameHeight), "Car Crasher");
+    window.setFramerateLimit(60);
     Renderer::initialise(window);
 
     try {
@@ -59,28 +56,25 @@ int main() {
         while (window.isOpen()) {
             Event event{};
             while (window.pollEvent(event)) {
-                // if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                //     window.close();
-                // }
                 if (event.type == Event::Closed) {
                     window.close(); // Handle window close event
                 }
                 if (event.type == Event::Resized) {
-                    // Adjust view to fit resized window
+                    // Can resize the window (prevents crashes)
                     FloatRect visibleArea(0, 0, event.size.width, event.size.height);
                     window.setView(View(visibleArea));
                 }
             }
 
-            window.clear(); // Clear the window
-            Update();       // Update game logic
-            Render();       // Render current scene
+            window.clear();
+            Update();
+            Render();
             window.display();
         }
     } catch (const exception &e) {
         cerr << "Error: " << e.what() << endl;
     }
 
-    Renderer::shutdown(); // Clean up renderer
+    Renderer::shutdown();
     return 0;
 }

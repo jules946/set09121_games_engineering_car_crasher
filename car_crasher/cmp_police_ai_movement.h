@@ -24,8 +24,6 @@ private:
 
     bool isObstacleInLane(float laneX, const EntityManager& em) const;
 
-    int getPlayerLane() const;
-
     int findBestPursuitLane(const EntityManager& em) const;
 
     void updatePursuit(double dt);

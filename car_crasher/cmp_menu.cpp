@@ -6,7 +6,7 @@
 #include "scene.h"
 
 
-// TextComponent implementation
+// Constructor
 TextComponent::TextComponent(Entity* p, const std::string& str)
     : Component(p), _selected(false) {
     _font = std::make_shared<sf::Font>();
@@ -110,7 +110,7 @@ void MenuComponent::update(double dt) {
                     activeScene = gameScene;
                 } else if (_selectedOption == 1) {
                     activeScene = changeCarScene;
-                    sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
+                    sf::sleep(sf::milliseconds(100));
                 } else if (_selectedOption == 2) {  // Toggle Difficulty
                     isHardDifficulty = !isHardDifficulty;
                     // Update the menu text
@@ -119,7 +119,7 @@ void MenuComponent::update(double dt) {
                     );
                 } else if (_selectedOption == 3) {  // Key Binds option
                     activeScene = keyBindScene;
-                    sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
+                    sf::sleep(sf::milliseconds(100));
                 } else if (_selectedOption == 4) {  // Quit option
                     if (!quitConfirmationActive) {
                         _menuItems[4]->getComponent<TextComponent>()->setText("Are you sure?");
@@ -150,7 +150,7 @@ void MenuComponent::update(double dt) {
     }
 
     // Update visibility
-    for (auto& item : _menuItems) {
+    for (const auto& item : _menuItems) {
         item->setVisible(_state != MenuState::TITLE);
     }
 }

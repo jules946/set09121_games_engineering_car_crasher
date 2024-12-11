@@ -9,7 +9,8 @@ using namespace sf;
 
 int livesInt = 3;
 
-void gameUIManager::loadLives(EntityManager& entityManager, int livesInt) {
+// Load the heart texture and create the hearts based on the livesInt
+void gameUIManager::loadLives(EntityManager& entityManager, const int livesInt) {
     if (!livesTexture.loadFromFile("res/img/heartLife.png")) {
         throw std::runtime_error("Failed to load road texture!");
     }
@@ -17,12 +18,12 @@ void gameUIManager::loadLives(EntityManager& entityManager, int livesInt) {
     for (int i = 0; i < livesInt; i++) {
         auto heart = std::make_shared<Entity>();
 
-        float yPos = 20.f;
-        float xPos = gameWidth - 150.f - i*45;
+        constexpr float yPos = 20.f;
+        const float xPos = gameWidth - 150.f - i*45;
 
-        heart->setPosition(sf::Vector2f(xPos, yPos));
+        heart->setPosition(Vector2f(xPos, yPos));
 
-        auto s = heart->addComponent<SpriteComponent>();
+        const auto s = heart->addComponent<SpriteComponent>();
         s->getSprite().setTexture(livesTexture);
         s->getSprite().setScale(0.1f, 0.1f);
         s->getSprite().setOrigin(0, 0);
@@ -71,6 +72,7 @@ void gameUIManager::updateScoreText(Text& scoreText) {
                        std::round(bounds.height / 2.f));
 }
 
+// Update the UI elements
 void gameUIManager::update(double dt, EntityManager& entityManager, Text& scoreText) const {
     auto& entities = entityManager.list;
     std::vector<std::shared_ptr<Entity>> uiHearts;
@@ -79,9 +81,9 @@ void gameUIManager::update(double dt, EntityManager& entityManager, Text& scoreT
     static float timeSinceLastScore = 0.0f;
     timeSinceLastScore += dt;
 
-    if (timeSinceLastScore >= 0.5f) {  // Every second
+    if (timeSinceLastScore >= 0.5f) {
         score += 10;
-        timeSinceLastScore = 0.0f;  // Reset the timer
+        timeSinceLastScore = 0.0f;
     }
     updateScoreText(scoreText);
     // Collect UI hearts
@@ -100,11 +102,11 @@ void gameUIManager::update(double dt, EntityManager& entityManager, Text& scoreT
     // Add missing hearts
     while (uiHearts.size() < livesInt) {
         auto heart = std::make_shared<Entity>();
-        float yPos = 20.f;
-        float xPos = gameWidth - 150.f - uiHearts.size() * 45;
-        heart->setPosition(sf::Vector2f(xPos, yPos));
+        constexpr float yPos = 20.f;
+        const float xPos = gameWidth - 150.f - uiHearts.size() * 45;
+        heart->setPosition(Vector2f(xPos, yPos));
 
-        auto s = heart->addComponent<SpriteComponent>();
+        const auto s = heart->addComponent<SpriteComponent>();
         s->getSprite().setTexture(livesTexture);
         s->getSprite().setScale(0.1f, 0.1f);
         s->getSprite().setOrigin(0, 0);
@@ -144,7 +146,7 @@ void gameUIManager::setupGameOverTexts(Text& gameOverText, Text& gameOverScoreTe
 
 // Just update the score text
 void gameUIManager::updateGameOverScore(Text& gameOverScoreText) {
-    std::string s = std::to_string(score);
+    const std::string s = std::to_string(score);
     gameOverScoreText.setString("Score: " + s);
     const FloatRect bounds = gameOverScoreText.getLocalBounds();
     gameOverScoreText.setOrigin(std::round(bounds.width / 2.f), std::round(bounds.height / 2.f));
