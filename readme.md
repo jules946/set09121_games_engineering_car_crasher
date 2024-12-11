@@ -30,6 +30,11 @@ The latest release of Car Crasher can be downloaded from the [Releases page](htt
 [Watch the gameplay video here](https://vimeo.com/1038347969)
 
 ---
+## 🌐 Game Website
+
+Visit the official game website for more details: [Car Crasher Website](https://lukesrepositories.github.io/CarCrasherWebsite/).
+
+---
 
 ## 🛠️ Requirements
 - Windows 10 or higher.
@@ -38,7 +43,7 @@ The latest release of Car Crasher can be downloaded from the [Releases page](htt
 ---
 
 ## 💡 Development
-Car Crasher was developed for the Edinrbugh Napier University Games Engineering Module using:
+Car Crasher was developed for the Edinburgh Napier University Games Engineering Module using:
 - **C++**
 - **SFML** for graphics and audio
 - **CMake** for build configuration
