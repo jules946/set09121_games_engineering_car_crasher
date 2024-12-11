@@ -11,8 +11,9 @@ ActorMovementComponent::ActorMovementComponent(Entity* p)
 
 ObstacleMovementComponent::ObstacleMovementComponent(Entity* p)
     : ActorMovementComponent(p) {
-    _lane = rand() % numLanes;  // Use numLanes from game_config.h
-    setSpeed(200.0f);
+    _lane = rand() % numLanes;
+    float speedMultiplier = isHardDifficulty ? 1.5f : 1.0f;
+    setSpeed(baseSpeed * speedMultiplier);
 }
 
 void ObstacleMovementComponent::update(double dt) {

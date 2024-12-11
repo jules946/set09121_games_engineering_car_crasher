@@ -7,7 +7,7 @@
 
 ObstacleManager::ObstacleManager(EntityManager& entityManager)
     : _entityManager(entityManager),
-      _spawnInterval(2.0f) {
+      _spawnInterval(isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL) {
     _spawnClock.restart();
 }
 
@@ -31,15 +31,19 @@ void ObstacleManager::initializeSprites() {
 
 const std::string& ObstacleManager::getRandomSprite() const {
     static const std::string heartSprite = "res/img/heartLife.png";
-    if (rand() % 10 == 0) {  // 10% chance for heart
+
+    // Only spawn heart if player has less than max lives and 10% chance
+    if (livesInt < 3 && rand() % 10 == 0) {
         return heartSprite;
     }
-    return _obstacleSprites[rand() % _obstacleSprites.size()];
+
+    // Get random sprite excluding the heart (last sprite)
+    return _obstacleSprites[rand() % (_obstacleSprites.size() - 1)];
 }
 
 
 void ObstacleManager::update(double dt) {
-
+    _spawnInterval = isHardDifficulty ? HARD_SPAWN_INTERVAL : EASY_SPAWN_INTERVAL;
     // Debug print to check spawn timing
     // std::cout << "Time since last spawn: " << _spawnClock.getElapsedTime().asSeconds() << std::endl;
 

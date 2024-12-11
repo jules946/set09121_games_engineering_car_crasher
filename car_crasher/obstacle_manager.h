@@ -13,6 +13,8 @@ private:
     std::vector<std::string> _obstacleSprites;
     EntityManager& _entityManager;
     bool _isGoodObstacle;
+    const float EASY_SPAWN_INTERVAL = 2.0f;
+    const float HARD_SPAWN_INTERVAL = 1.2f;
 
 public:
     explicit ObstacleManager(EntityManager& entityManager);
