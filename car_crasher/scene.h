@@ -25,5 +25,6 @@ extern std::shared_ptr<Scene> gameScene;
 extern std::shared_ptr<Scene> pauseScene;
 extern std::shared_ptr<Scene> gameOverScene;
 extern std::shared_ptr<Scene> keyBindScene;
+extern std::shared_ptr<Scene> changeCarScene;
 
 

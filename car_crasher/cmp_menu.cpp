@@ -113,9 +113,15 @@ void MenuComponent::update(double dt) {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
             if (_type == MenuType::MAIN) {
-                if (_selectedOption == 0) {
-                    activeScene = gameScene;  // Start game
-                } else if (_selectedOption == 3) {  // Key Binds option
+                if (_selectedOption == 0) {  // Play Game
+                    gameScene = std::make_shared<GameScene>();  // Always create new scene
+                    gameScene->load();  // This will use the currently selected car
+                    activeScene = gameScene;
+                } else if (_selectedOption == 1) {
+                    activeScene = changeCarScene;
+                    sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
+                }
+                else if (_selectedOption == 3) {  // Key Binds option
                     activeScene = keyBindScene;
                     sf::sleep(sf::milliseconds(100));  // Add a small delay to ensure no carry-over
                 }

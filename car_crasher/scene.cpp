@@ -9,6 +9,7 @@ std::shared_ptr<Scene> gameScene;
 std::shared_ptr<Scene> pauseScene;
 std::shared_ptr<Scene> gameOverScene;
 std::shared_ptr<Scene> keyBindScene;
+std::shared_ptr<Scene> changeCarScene;
 
 // for testing menu
 std::vector<std::shared_ptr<Entity>>& Scene::getEnts() {

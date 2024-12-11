@@ -14,12 +14,16 @@ SoundEffectComponent::SoundEffectComponent(Entity* p, const std::string& soundFi
 void SoundEffectComponent::playSound() {
     if (_sound.getStatus() != sf::Sound::Playing) {
         _sound.play();
+        std::cout << "Playing sound." << std::endl;
+    } else {
+        std::cout << "Sound already playing." << std::endl;
     }
 }
-
 void SoundEffectComponent::stopSound() {
+    std::cout << "Stopping sound..." << std::endl;
     if (_sound.getStatus() == sf::Sound::Playing) {
         _sound.stop();
+        std::cout << "Sound stopped" << std::endl;
     }
 }
 

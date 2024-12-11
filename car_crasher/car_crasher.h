@@ -7,7 +7,10 @@
 #include "game_UI_Manager.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
+enum class CarType;
+extern CarType selectedCar;  // Add before ChangeCarScene class definition
 
+enum class CarType { BLUE, GREY, RED, STRIPED };
 
 // Forward declaration of MenuScene class
 class MenuScene final : public Scene {
@@ -85,4 +88,22 @@ public:
     void load() override;
     void update(double dt) override;
     void render() override;
+};
+
+class ChangeCarScene : public Scene {
+private:
+    sf::Font font;
+    sf::Text titleText;
+    std::vector<std::pair<sf::Text, std::string>> carOptions;
+    size_t selectedOption = 0;
+    //static CarType selectedCar;
+    CarType selectedCar;
+
+public:
+    void load() override;
+    void update(double dt) override;
+    void render() override;
+    // static CarType getSelectedCar() { return selectedCar; }
+    CarType getSelectedCar() { return selectedCar; }
+    static std::string getCarTexturePath(CarType car);
 };

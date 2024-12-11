@@ -22,11 +22,13 @@ void Load() {
     pauseScene = std::make_shared<PauseScene>();
     gameOverScene = std::make_shared<GameOverScene>();
     keyBindScene = std::make_shared<KeyBindScene>();
+    changeCarScene = std::make_shared<ChangeCarScene>();
     pauseScene->load();
 
     menuScene->load();
     gameOverScene->load();
     keyBindScene->load();
+    changeCarScene->load();
 
     activeScene = menuScene;
 }

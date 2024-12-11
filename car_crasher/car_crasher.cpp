@@ -39,6 +39,19 @@ int score;
 std::unique_ptr<KeyBindComponent> keyBindComponent;
 static bool enterKeyReleased = false; // make sure Enter key is not registered before accessing KeyBindScene
 
+//CarType ChangeCarScene::selectedCar = CarType::BLUE;
+CarType selectedCar = CarType::BLUE;  // Move outside of ChangeCarScene
+
+std::string ChangeCarScene::getCarTexturePath(CarType car) {
+    switch (car) {
+        case CarType::BLUE: return "res/img/BlueCar.png";
+        case CarType::GREY: return "res/img/Car_Grey.png";
+        case CarType::RED: return "res/img/Car_Red.png";
+        case CarType::STRIPED: return "res/img/Car_Striped.png";
+        default: return "res/img/BlueCar.png";
+    }
+}
+
 // MenuScene class implementation
 void MenuScene::load() {
     if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
@@ -134,9 +147,17 @@ void GameScene::load() {
     // Create player
     _player = make_shared<Entity>();
 
-    // Add sprite component to player
+    std::cout << "Loading car: " << static_cast<int>(selectedCar) << std::endl;
+    //std::cout << "Loading car: " << static_cast<int>(ChangeCarScene::getSelectedCar()) << std::endl;
     const auto s = _player->addComponent<SpriteComponent>();
-    s->setTexture("res/img/BlueCar.png");
+    //s->setTexture(ChangeCarScene::getCarTexturePath(ChangeCarScene::getSelectedCar()));
+    s->setTexture(ChangeCarScene::getCarTexturePath(selectedCar));
+
+
+    // Add sprite component to player
+    //s->setTexture("res/img/BlueCar.png");
+
+
     s->getSprite().setScale(2.0f, 2.0f);
     s->getSprite().setOrigin(s->getSprite().getLocalBounds().width / 2.f,
                              s->getSprite().getLocalBounds().height / 2.f);
@@ -249,15 +270,32 @@ void GameScene::render() {
 
 // Created to stop the screeching sound while the game is paused
 void GameScene::pauseSounds() {
+    std::cout << "Pausing sounds..." << std::endl;
     if (auto sound = _player->getComponent<SoundEffectComponent>()) {
+        std::cout << "Found player sound component" << std::endl;
         sound->stopSound();
     }
 
     for (auto& entity : _entity_manager.list) {
         if (auto sound = entity->getComponent<SoundEffectComponent>()) {
+            std::cout << "Found entity sound component" << std::endl;
             sound->stopSound();
         }
     }
+
+    // TODO make sure police sounds stop in pause menu
+    // Stop the police siren sound specifically
+    //if (_cop) {
+      //  if (auto copSound = _cop->getComponent<SoundEffectComponent>()) {
+        //    auto status = copSound->getSoundStatus(); // Add a method to return _sound.getStatus()
+          //  std::cout << "Cop sound status before stopping: "
+            //          << (status == sf::Sound::Playing ? "Playing" : "Not Playing") << std::endl;
+            //copSound->stopSound();
+        //}
+    //}
+
+
+
 }
 
 void PauseScene::load() {
@@ -366,6 +404,77 @@ void KeyBindScene::render() {
     Scene::render();
 }
 
+void ChangeCarScene::load() {
+    if (!font.loadFromFile("res/fonts/PixelifySans-VariableFont_wght.ttf")) {
+        throw std::runtime_error("Failed to load font!");
+    }
+
+    titleText.setFont(font);
+    titleText.setString("Choose Your Car");
+    titleText.setCharacterSize(48);
+    titleText.setPosition(gameWidth / 2.f, gameHeight / 4.f);
+    titleText.setOrigin(titleText.getLocalBounds().width / 2.f, titleText.getLocalBounds().height / 2.f);
+
+    std::vector<std::pair<std::string, std::string>> options = {
+        {"Blue Car", "res/img/BlueCar.png"},
+        {"Grey Car", "res/img/Car_Grey.png"},
+        {"Red Car", "res/img/Car_Red.png"},
+        {"Striped Car", "res/img/Car_Striped.png"}
+    };
+
+    float yPos = gameHeight / 2.f;
+    for (const auto& opt : options) {
+        sf::Text text;
+        text.setFont(font);
+        text.setString(opt.first);
+        text.setCharacterSize(32);
+        text.setPosition(gameWidth / 2.f, yPos);
+        text.setOrigin(text.getLocalBounds().width / 2.f, text.getLocalBounds().height / 2.f);
+        carOptions.emplace_back(text, opt.second);
+        yPos += 60.f;
+    }
+}
+
+void ChangeCarScene::update(double dt) {
+    static bool upPressed = false;
+    static bool downPressed = false;
+    static bool returnPressed = false;
+    static sf::Clock inputDelay;
+
+    if (inputDelay.getElapsedTime().asSeconds() > 0.15f) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !upPressed) {
+            selectedOption = (selectedOption - 1 + carOptions.size()) % carOptions.size();
+            upPressed = true;
+            inputDelay.restart();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !downPressed) {
+            selectedOption = (selectedOption + 1) % carOptions.size();
+            downPressed = true;
+            inputDelay.restart();
+        }
+    }
+
+    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) upPressed = false;
+    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) downPressed = false;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && !returnPressed) {
+        selectedCar = static_cast<CarType>(selectedOption);
+        std::cout << "Selected car: " << static_cast<int>(selectedCar) << std::endl;
+        activeScene = menuScene;
+        returnPressed = true;
+    }
+    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) returnPressed = false;
+
+    Scene::update(dt);
+}
+
+void ChangeCarScene::render() {
+    Renderer::queue(&titleText);
+    for (size_t i = 0; i < carOptions.size(); ++i) {
+        carOptions[i].first.setFillColor(i == selectedOption ? sf::Color::Yellow : sf::Color::White);
+        Renderer::queue(&carOptions[i].first);
+    }
+}
 
 /* old key binds code
 / can be an alternative
